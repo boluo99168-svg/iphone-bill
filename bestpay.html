@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Comprovante Bancário · iPhone 16 Estilo</title>
+<!-- html2canvas para captura perfeita -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none; /* evita seleção durante screenshot */
+}
+
+body{
+    background: linear-gradient(145deg, #d4d9e2 0%, #bfc6d0 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, Arial, Helvetica, sans-serif;
+    padding: 30px 20px;
+}
+
+/* Layout com dois painéis */
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 36px;
+    max-width: 1100px;
+    width: 100%;
+}
+
+/* Painel de controle esquerdo */
+.control-panel {
+    width: 280px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(2px);
+    border-radius: 36px;
+    box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.3);
+    padding: 22px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+}
+.control-panel h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #1e2b3c, #0f5b7a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 6px;
+}
+.control-panel .desc {
+    font-size: 12px;
+    color: #4b5c6e;
+    margin-bottom: 24px;
+    border-left: 3px solid #1677ff;
+    padding-left: 10px;
+}
+.input-field {
+    margin-bottom: 18px;
+}
+.input-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e2f3e;
+    margin-bottom: 6px;
+}
+.control-panel input {
+    width: 100%;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1.5px solid #e2edf7;
+    border-radius: 24px;
+    font-size: 14px;
+    outline: none;
+    font-family: monospace;
+}
+.control-panel input:focus {
+    border-color: #1677ff;
+    box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.2);
+}
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 28px;
+}
+.btn {
+    border: none;
+    padding: 12px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 15px;
+    background: #1677ff;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-outline {
+    background: #2c3e50;
+}
+.btn:hover {
+    background: #0e5fdf;
+    transform: translateY(-2px);
+}
+
+/* ========= iPhone 16 风格手机外壳 ========= */
+.phone-container {
+    position: relative;
+    width: 390px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 28px 38px -12px rgba(0, 0, 0, 0.5));
+}
+.iphone-body {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 360 / 780;
+    background: #1c1c1e;
+    border-radius: 56px;
+    box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.6), inset 0 0 0 3px rgba(255, 255, 255, 0.08);
+    padding: 8px;
+    border: 1px solid #3a3a3c;
+}
+/* 动态岛 */
+.iphone-body::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 34px;
+    background: #111;
+    border-radius: 28px;
+    z-index: 20;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.2);
+}
+/* 物理按键 */
+.iphone-body .vol-up { position: absolute; left: -3px; top: 100px; width: 4px; height: 32px; background: #2a2a2c; border-radius: 4px 0 0 4px; z-index: 15; }
+.iphone-body .vol-down { position: absolute; left: -3px; top: 142px; width: 4px; height: 32px; background: #2a2a2c; border-radius: 4px 0 0 4px; z-index: 15; }
+.iphone-body .power { position: absolute; right: -3px; top: 120px; width: 4px; height: 48px; background: #2a2a2c; border-radius: 0 4px 4px 0; z-index: 15; }
+.iphone-body .action-btn { position: absolute; left: -3px; top: 60px; width: 4px; height: 28px; background: #2a2a2c; border-radius: 4px 0 0 4px; z-index: 15; }
+
+/* 屏幕区域 (fundo cinza realista) */
+.phone-screen {
+    background: #efefef;
+    border-radius: 50px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+.screen-inner {
+    background: transparent;
+    min-height: 100%;
+    padding-bottom: 20px;
+    overflow-y: visible;
+}
+
+/* 状态栏 */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px 6px 20px;
+    font-size: 15px;
+    font-weight: 590;
+    background: #efefef;
+    color: #121212;
+    font-family: monospace;
+}
+.time-text { font-weight: 600; }
+.status-icons { display: flex; align-items: center; gap: 6px; }
+.signal { display: flex; align-items: flex-end; gap: 2px; }
+.signal span { width: 3.5px; background: #1c1c1e; display: block; border-radius: 1px; }
+.signal span:nth-child(1) { height: 4px; }
+.signal span:nth-child(2) { height: 7px; }
+.signal span:nth-child(3) { height: 10px; }
+.signal span:nth-child(4) { height: 12px; }
+
+/* Bateria estilo iOS */
+.apple-battery { display: flex; align-items: center; margin-left: 4px; }
+.battery-wrapper { position: relative; display: flex; align-items: center; }
+.battery-shell { width: 24px; height: 12px; border: 1.2px solid #1c1c1e; border-radius: 4px; background: transparent; position: relative; }
+.battery-fill { height: 100%; background: #2e7d32; border-radius: 2px; width: 80%; transition: width 0.1s ease, background 0.2s; }
+.battery-shell::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 5px; background: #1c1c1e; border-radius: 1px; }
+.battery-low .battery-shell { border-color: #e34d4d; }
+.battery-low .battery-fill { background: #e34d4d; }
+.battery-low .battery-shell::after { background: #e34d4d; }
+
+/* Safari 地址栏 */
+.safari-url {
+    background: #eef2f8;
+    margin: 8px 16px;
+    border-radius: 16px;
+    padding: 8px 14px;
+    font-size: 13px;
+    text-align: center;
+    color: #1f2e3a;
+    font-weight: 500;
+}
+
+/* ===== Cartão do comprovante (estilo banco) ===== */
+.card {
+    background: #fff;
+    margin: 10px 12px 20px;
+    padding: 16px 16px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    box-shadow: none;
+    border: none;
+}
+.title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+.line {
+    height: 1px;
+    background: #000;
+    opacity: 0.7;
+    margin: 10px 0;
+}
+.label {
+    font-weight: 700;
+    color: #000;
+}
+.value {
+    color: #555;
+    margin-top: 2px;
+}
+.status-ok {
+    color: #7a7a7a;
+}
+.block {
+    margin-bottom: 10px;
+}
+.id {
+    font-size: 11px;
+    color: #555;
+    word-break: break-all;
+    white-space: normal;
+}
+/* ID em linha única (opcional, mas seguro) */
+.id-single {
+    white-space: nowrap;
+    overflow-x: auto;
+    font-family: monospace;
+}
+
+/* Remove scrollbars globalmente */
+::-webkit-scrollbar { display: none; }
+body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms-overflow-style: none; }
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+    <!-- Painel de controle -->
+    <div class="control-panel">
+        <h2>🏦 Comprovante</h2>
+        <div class="desc">iPhone 16 · Edição bancária realista</div>
+        <div class="input-field">
+            <label>💰 VALOR (R$)</label>
+            <input type="text" id="amountInput" placeholder="Ex: 200,00" value="200,00">
+        </div>
+        <div class="input-field">
+            <label>⏱️ REALIZADO EM</label>
+            <input type="text" id="timeInput" placeholder="dd/mm/aaaa HH:MM:SS" value="12/04/2026 14:11:39">
+        </div>
+        <div class="input-field">
+            <label>👤 NOME DO FAVORECIDO</label>
+            <input type="text" id="favorecidoInput" placeholder="Nome completo" value="GABRIEL HIDEKI SUYAMA">
+        </div>
+        <div class="input-field">
+            <label>🆔 IDENTIFICADOR</label>
+            <input type="text" id="idInput" placeholder="Identificador" value="E31841474202604121711B84FCTIKD31">
+        </div>
+        <div class="input-field">
+            <label>📱 Horário status</label>
+            <input type="text" id="statusTimeInput" placeholder="14:11" value="14:11">
+        </div>
+        <div class="input-field">
+            <label>🔋 Bateria (%) ≤20 vermelho / >20 verde</label>
+            <input type="number" id="batteryInput" min="0" max="100" value="87">
+        </div>
+        <div class="button-group">
+            <button class="btn" id="updateBtn">✨ Atualizar comprovante</button>
+            <button class="btn btn-outline" id="screenshotBtn">📸 Baixar screenshot</button>
+        </div>
+        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Layout fiel ao banco | ID quebra automática</div>
+    </div>
+
+    <!-- iPhone com comprovante -->
+    <div class="phone-container" id="captureArea">
+        <div class="iphone-body">
+            <div class="action-btn"></div>
+            <div class="vol-up"></div>
+            <div class="vol-down"></div>
+            <div class="power"></div>
+            <div class="phone-screen">
+                <div class="screen-inner">
+                    <div class="status-bar">
+                        <span class="time-text" id="phoneTime">14:11</span>
+                        <div class="status-icons">
+                            <div class="signal"><span></span><span></span><span></span><span></span></div>
+                            <span style="font-size:12px;">5G</span>
+                            <div class="apple-battery" id="appleBatteryWidget">
+                                <div class="battery-wrapper">
+                                    <div class="battery-shell">
+                                        <div class="battery-fill" id="batteryLevelFill" style="width:87%; background:#2e7d32;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="safari-url">🔒 banco.pix.gov.br · Transferência</div>
+
+                    <!-- Comprovante fiel ao estilo solicitado -->
+                    <div class="card">
+                        <div class="title">COMPROVANTE DE TRANSAÇÃO BANCÁRIA</div>
+                        <div class="line"></div>
+
+                        <div class="block">
+                            <div class="label">SITUAÇÃO:</div>
+                            <div class="value status-ok">EFETIVADO</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">REALIZADO EM:</div>
+                            <div class="value" id="timeDisplay">12/04/2026 14:11:39</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">VALOR:</div>
+                            <div class="value" id="amountDisplay">200,00</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">TIPO DE TRANSFERÊNCIA:</div>
+                            <div class="value">PIX</div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <div class="block">
+                            <div class="label">NOME DO DEPOSITANTE:</div>
+                            <div class="value">-</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">CNPJ:</div>
+                            <div class="value">6000392</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">Banco/Instituição:</div>
+                            <div class="value">6000392</div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <div class="block">
+                            <div class="label">NOME DO FAVORECIDO:</div>
+                            <div class="value" id="favorecidoDisplay">GABRIEL HIDEKI SUYAMA</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">CPF/CNPJ:</div>
+                            <div class="value">12521386952</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">Pix Para Beneficiário:</div>
+                            <div class="value">12521386952</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">AGÊNCIA:</div>
+                            <div class="value">40710595</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">ISPB Nome:</div>
+                            <div class="value">-</div>
+                        </div>
+                        <div class="block">
+                            <div class="label">CONTA:</div>
+                            <div class="value">Conta Corrente</div>
+                        </div>
+
+                        <div class="line"></div>
+
+                        <div class="block">
+                            <div class="label">Identificador:</div>
+                            <div class="id" id="idDisplay">E31841474202604121711B84FCTIKD31</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Elementos do DOM
+    const amountInput = document.getElementById('amountInput');
+    const timeInput = document.getElementById('timeInput');
+    const favorecidoInput = document.getElementById('favorecidoInput');
+    const idInput = document.getElementById('idInput');
+    const statusTimeInput = document.getElementById('statusTimeInput');
+    const batteryInput = document.getElementById('batteryInput');
+    const updateBtn = document.getElementById('updateBtn');
+    const screenshotBtn = document.getElementById('screenshotBtn');
+
+    const amountDisplay = document.getElementById('amountDisplay');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const favorecidoDisplay = document.getElementById('favorecidoDisplay');
+    const idDisplay = document.getElementById('idDisplay');
+    const phoneTimeSpan = document.getElementById('phoneTime');
+    const batteryFillElement = document.getElementById('batteryLevelFill');
+    const batteryWidget = document.getElementById('appleBatteryWidget');
+
+    // Formatação de valor monetário (apenas número, sem R$)
+    function formatCurrencyBRL(value) {
+        let raw = value.trim();
+        if (raw === "") return "0,00";
+        let cleanRaw = raw.replace(/^R\$\s*/, '');
+        let numeric = cleanRaw.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+        let number = parseFloat(numeric);
+        if (isNaN(number)) number = 0;
+        let fixed = number.toFixed(2).replace('.', ',');
+        let parts = fixed.split(',');
+        let integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return `${integerPart},${parts[1]}`;
+    }
+
+    // Atualizar bateria (≤20% vermelho, >20% verde)
+    function updateBatteryUI(percent) {
+        let p = Math.min(100, Math.max(0, percent));
+        batteryFillElement.style.width = p + "%";
+        if (p <= 20) {
+            batteryFillElement.style.background = "#e34d4d";
+            batteryWidget.classList.add('battery-low');
+        } else {
+            batteryFillElement.style.background = "#2e7d32";
+            batteryWidget.classList.remove('battery-low');
+        }
+    }
+
+    // Atualizar todos os dados dinâmicos
+    function refreshAllData() {
+        // Valor
+        let amountRaw = amountInput.value;
+        if (amountRaw === "") amountRaw = "0,00";
+        amountDisplay.innerText = formatCurrencyBRL(amountRaw);
+        
+        // Data/hora
+        let timeVal = timeInput.value.trim();
+        if (timeVal === "") timeVal = "12/04/2026 14:11:39";
+        timeDisplay.innerText = timeVal;
+        
+        // Nome do favorecido
+        let favorecidoVal = favorecidoInput.value.trim();
+        if (favorecidoVal === "") favorecidoVal = "GABRIEL HIDEKI SUYAMA";
+        favorecidoDisplay.innerText = favorecidoVal;
+        
+        // Identificador (ID) - sem quebras de linha
+        let idVal = idInput.value.trim();
+        if (idVal === "") idVal = "E31841474202604121711B84FCTIKD31";
+        idVal = idVal.replace(/[\n\r\t]/g, '');
+        idDisplay.innerText = idVal;
+        if (idInput.value !== idVal) idInput.value = idVal;
+        
+        // Horário da status bar
+        let phoneTimeVal = statusTimeInput.value.trim();
+        if (phoneTimeVal === "") phoneTimeVal = "14:11";
+        phoneTimeSpan.innerText = phoneTimeVal;
+        
+        // Bateria
+        let batteryVal = parseInt(batteryInput.value);
+        if (isNaN(batteryVal)) batteryVal = 87;
+        batteryVal = Math.min(100, Math.max(0, batteryVal));
+        updateBatteryUI(batteryVal);
+    }
+
+    // Captura de tela (html2canvas)
+    async function captureScreenshot() {
+        const target = document.getElementById('captureArea');
+        if (!target) return;
+        
+        const originalText = screenshotBtn.innerText;
+        screenshotBtn.innerText = '📸 Gerando...';
+        screenshotBtn.disabled = true;
+        
+        try {
+            refreshAllData();
+            await new Promise(r => setTimeout(r, 80));
+            
+            const canvas = await html2canvas(target, {
+                scale: 2.8,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false,
+                allowTaint: false,
+                onclone: (clonedDoc) => {
+                    const clonedId = clonedDoc.querySelector('#idDisplay');
+                    if (clonedId) clonedId.style.whiteSpace = "normal";
+                    const clonedBattery = clonedDoc.querySelector('#appleBatteryWidget');
+                    if (clonedBattery && batteryWidget.classList.contains('battery-low')) {
+                        clonedBattery.classList.add('battery-low');
+                    }
+                    const clonedFill = clonedDoc.querySelector('#batteryLevelFill');
+                    if (clonedFill) {
+                        clonedFill.style.width = batteryFillElement.style.width;
+                        clonedFill.style.background = batteryFillElement.style.background;
+                    }
+                }
+            });
+            
+            const link = document.createElement('a');
+            link.download = 'comprovante_iphone.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        } catch (err) {
+            console.error('Erro no screenshot:', err);
+            alert('Falha ao gerar imagem. Recarregue a página e tente novamente.');
+        } finally {
+            screenshotBtn.innerText = originalText;
+            screenshotBtn.disabled = false;
+        }
+    }
+    
+    // Eventos
+    updateBtn.addEventListener('click', refreshAllData);
+    screenshotBtn.addEventListener('click', captureScreenshot);
+    
+    const allInputs = [amountInput, timeInput, favorecidoInput, idInput, statusTimeInput, batteryInput];
+    allInputs.forEach(inp => {
+        inp.addEventListener('input', refreshAllData);
+        inp.addEventListener('change', refreshAllData);
+    });
+    
+    // Prevenir quebras de linha no campo ID
+    idInput.addEventListener('input', function() {
+        let raw = this.value;
+        if (raw.includes('\n') || raw.includes('\r') || raw.includes('\t')) {
+            this.value = raw.replace(/[\n\r\t]/g, '');
+            refreshAllData();
+        }
+    });
+    
+    // Inicialização
+    refreshAllData();
+</script>
+</body>
+</html>
