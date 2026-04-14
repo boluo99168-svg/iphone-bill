@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>纯色电池 · 无滑动条 · ID单行完美 | 账单截图</title>
+    <title>iPhone 16 风格账单 | 纯代码相框 · 完美截图</title>
     <!-- html2canvas 最新稳定版 -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
@@ -127,7 +127,7 @@
             box-shadow: 0 10px 18px rgba(22, 119, 255, 0.3);
         }
 
-        /* ========= 手机外观 (纯正苹果风格，无横向/纵向滚动条干扰) ========= */
+        /* ========= 手机外观 - 纯代码实现 iPhone 16 Pro Max 风格相框 ========= */
         .phone-container {
             position: relative;
             width: 400px;
@@ -135,48 +135,87 @@
             filter: drop-shadow(0 28px 38px -12px rgba(0, 0, 0, 0.5));
         }
 
+        /* 机身主体 - 模拟 iPhone 16 系列钛金属边框 */
         .iphone-body {
             position: relative;
             width: 100%;
-            aspect-ratio: 390 / 780;
-            background: #121212;
+            aspect-ratio: 360 / 780;  /* 19.5:9 全面屏比例 */
+            background: #1c1c1e;      /* 深空黑/钛金属边框色 */
             border-radius: 56px;
-            box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.1);
-            padding: 12px 8px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            overflow: hidden; /* 防止任何溢出滚动条 */
+            box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.6), inset 0 0 0 3px rgba(255, 255, 255, 0.08);
+            padding: 8px;
+            border: 1px solid #3a3a3c;
         }
 
-        .iphone-body::before {
-            content: "";
-            position: absolute;
-            left: -3px;
-            top: 100px;
-            width: 5px;
-            height: 34px;
-            background: #2a2a2a;
-            border-radius: 4px 0 0 4px;
-        }
-        .iphone-body::after {
-            content: "";
-            position: absolute;
-            right: -3px;
-            top: 130px;
-            width: 5px;
-            height: 52px;
-            background: #2a2a2a;
-            border-radius: 0 4px 4px 0;
-        }
-
-        /* 屏幕区域 - 完全禁用滚动条，内容自动撑开且无滚动 */
-        .screen-area {
+        /* 屏幕玻璃层 - 无滚动条 */
+        .phone-screen {
             background: #f8fafc;
-            border-radius: 48px;
+            border-radius: 50px;
             width: 100%;
             height: 100%;
             overflow: hidden;  /* 关键：去掉右侧滑动屏幕设置，无任何滚动条 */
             position: relative;
-            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+        }
+
+        /* 动态岛 (iPhone 14/15/16 系列标志) */
+        .iphone-body::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 34px;
+            background: #111;
+            border-radius: 28px;
+            z-index: 20;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* 左侧音量键 (上) */
+        .iphone-body .vol-up {
+            position: absolute;
+            left: -3px;
+            top: 100px;
+            width: 4px;
+            height: 32px;
+            background: #2a2a2c;
+            border-radius: 4px 0 0 4px;
+            z-index: 15;
+        }
+        /* 左侧音量键 (下) */
+        .iphone-body .vol-down {
+            position: absolute;
+            left: -3px;
+            top: 142px;
+            width: 4px;
+            height: 32px;
+            background: #2a2a2c;
+            border-radius: 4px 0 0 4px;
+            z-index: 15;
+        }
+        /* 右侧电源键 */
+        .iphone-body .power {
+            position: absolute;
+            right: -3px;
+            top: 120px;
+            width: 4px;
+            height: 48px;
+            background: #2a2a2c;
+            border-radius: 0 4px 4px 0;
+            z-index: 15;
+        }
+        /* 操作按钮 (iPhone 15 Pro 及以上新增) */
+        .iphone-body .action-btn {
+            position: absolute;
+            left: -3px;
+            top: 60px;
+            width: 4px;
+            height: 28px;
+            background: #2a2a2c;
+            border-radius: 4px 0 0 4px;
+            z-index: 15;
         }
 
         .screen-inner {
@@ -222,7 +261,7 @@
         .signal span:nth-child(3) { height: 10px; }
         .signal span:nth-child(4) { height: 12px; }
 
-        /* 纯色电池组件 */
+        /* 纯色电池组件 - 无闪电 */
         .apple-battery {
             display: flex;
             align-items: center;
@@ -321,7 +360,7 @@
             align-items: baseline;
             margin-bottom: 16px;
             font-size: 13px;
-            flex-wrap: nowrap;  /* 确保不换行破坏布局 */
+            flex-wrap: nowrap;
         }
         .label-txt {
             font-weight: 600;
@@ -332,12 +371,12 @@
             font-weight: 500;
             color: #11181c;
             text-align: right;
-            word-break: keep-all;  /* 防止单词内换行 */
+            word-break: keep-all;
             white-space: nowrap;
             overflow-x: visible;
         }
 
-        /* ID 单行强制 - 绝无跳行，无滚动条，完全在一行内展示 */
+        /* ID 单行强制 - 绝无跳行 */
         .id-single-line {
             white-space: nowrap;
             display: inline-block;
@@ -367,11 +406,11 @@
             margin-top: 16px;
         }
 
-        /* 确保没有任何意外的滚动条出现 */
+        /* 彻底隐藏所有滚动条 */
         ::-webkit-scrollbar {
             display: none;
         }
-        body, .screen-area, .iphone-body, .phone-container {
+        body, .phone-screen, .iphone-body, .phone-container {
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
@@ -381,7 +420,7 @@
 <div class="dashboard">
     <div class="editor-card">
         <h2>📱 账单工坊</h2>
-        <div class="desc">纯色电池 · 无滑动条 · ID强制单行</div>
+        <div class="desc">iPhone 16 风格相框 · ID单行 · 红绿电池</div>
         <div class="input-field">
             <label>💰 Valor (R$)</label>
             <input type="text" id="amountInput" placeholder="例如: 62,00" value="62,00">
@@ -410,13 +449,18 @@
             <button class="btn" id="updateBtn">✨ 刷新账单</button>
             <button class="btn btn-outline" id="screenshotBtn">📸 下载完美截图</button>
         </div>
-        <div class="desc" style="margin-top: 18px; font-size: 10px;">✔ 无横向/纵向滚动条<br>✔ ID强制一行不跳行</div>
+        <div class="desc" style="margin-top: 18px; font-size: 10px;">✔ 纯代码iPhone 16相框 | 无滑动条<br>✔ ID强制一行不跳行 | 电量红绿切换</div>
     </div>
 
-    <!-- 手机截图核心区 - 无滚动条 -->
+    <!-- 手机截图核心区 - 纯CSS相框，无任何外部图片 -->
     <div class="phone-container" id="captureArea">
         <div class="iphone-body">
-            <div class="screen-area">
+            <!-- 物理按键装饰 -->
+            <div class="action-btn"></div>
+            <div class="vol-up"></div>
+            <div class="vol-down"></div>
+            <div class="power"></div>
+            <div class="phone-screen">
                 <div class="screen-inner">
                     <!-- 状态栏区域 -->
                     <div class="status-bar">
@@ -426,7 +470,6 @@
                                 <span></span><span></span><span></span><span></span>
                             </div>
                             <span style="font-size:12px;">5G</span>
-                            <!-- 纯色电池组件 (无闪电) -->
                             <div class="apple-battery" id="appleBatteryWidget">
                                 <div class="battery-wrapper">
                                     <div class="battery-shell">
@@ -451,7 +494,7 @@
                             <span class="label-txt">Tempo de transaccao</span>
                             <span class="value-txt" id="timeDisplay">13/04/2026 01:34</span>
                         </div>
-                        <!-- ID行：强制单行，无滚动条，完美一行显示 -->
+                        <!-- ID行：强制单行，完美一行显示 -->
                         <div class="info-row">
                             <span class="label-txt">ID da transacção</span>
                             <div class="id-wrapper">
@@ -571,13 +614,11 @@
         if (timeVal === "") timeVal = "13/04/2026 01:34";
         timeDisplay.innerText = timeVal;
         
-        // ID 强制单行：移除换行符，确保在一行内显示
+        // ID 强制单行：移除换行符、回车符
         let idVal = idInput.value.trim();
         if (idVal === "") idVal = "E508719212026041304341DIQRSOLGTM";
-        // 移除所有换行符、回车符，确保单行
         idVal = idVal.replace(/[\n\r\t]/g, '');
         idDisplay.innerText = idVal;
-        // 同步回输入框（保持清洁）
         if (idInput.value !== idVal) idInput.value = idVal;
         
         // 收款人姓名
@@ -597,7 +638,7 @@
         updateBatteryUI(batteryVal);
     }
 
-    // 截图功能 (完美捕获所有样式，无滚动条干扰)
+    // 截图功能 (完美捕获所有样式，无滚动条)
     async function captureScreenshot() {
         const target = document.getElementById('captureArea');
         if (!target) return;
@@ -639,14 +680,14 @@
                         clonedFill.style.width = batteryFillElement.style.width;
                         clonedFill.style.background = batteryFillElement.style.background;
                     }
-                    // 确保无滚动条样式克隆
-                    const clonedScreen = clonedDoc.querySelector('.screen-area');
+                    // 确保无滚动条
+                    const clonedScreen = clonedDoc.querySelector('.phone-screen');
                     if (clonedScreen) clonedScreen.style.overflow = "hidden";
                 }
             });
             
             const link = document.createElement('a');
-            link.download = 'no_scrollbar_bill.png';
+            link.download = 'iphone16_bill.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
         } catch (err) {
