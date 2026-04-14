@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proof of transfer</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background:#f5f5f5;
+    display:flex;
+    gap:40px;
+    justify-content:center;
+    align-items:flex-start;
+    padding:40px;
+}
+
+/* 左侧控制面板 */
+.panel{
+    width:260px;
+    background:#fff;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+}
+.panel input{
+    width:100%;
+    padding:10px;
+    margin-bottom:10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+}
+.panel button{
+    width:100%;
+    padding:12px;
+    background:#1677ff;
+    color:#fff;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+/* 右侧凭证 */
+.container {
+    position: relative;
+    width: 360px;
+    padding: 20px;
+    border-radius: 12px;
+    background:#fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 107.7px;
+    height: 30px;
+    background-image: url('https://uspay.univepay.com/Images/logo2.png');
+    background-size: 100% 100%;
+}
+
+.form-group { margin-top: 40px; }
+.first-form { margin-top: 60px; }
+
+.form-group-title {
+    text-align: right;
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.form-row label {
+    font-size: 12px;
+    font-weight:bold;
+}
+
+.form-row span {
+    font-size: 12px;
+}
+
+.divider {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 左侧输入 -->
+<div class="panel">
+    <h3>生成数据</h3>
+
+    <input id="inputAmount" placeholder="金额 (62.00)">
+    <input id="inputTime" placeholder="时间 13/04/2026 01:34">
+    <input id="inputName" placeholder="姓名">
+
+    <button onclick="generate()">生成</button>
+</div>
+
+<!-- 右侧凭证 -->
+<div class="container">
+    <div class="logo"></div>
+
+    <div class="form-group first-form">
+        <div class="divider"></div>
+        <div class="form-group-title">comprovante de transacção</div>
+
+        <div class="form-row">
+            <label>Valor</label>
+            <span id="formattedAmount">R$ 62,00</span>
+        </div>
+
+        <div class="form-row">
+            <label>Tempo de transaccao</label>
+            <span id="transactionTime">13/04/2026 01:34</span>
+        </div>
+
+        <div class="form-row">
+            <label>ID da transaccao</label>
+            <span id="end2endId">E508719212026041304341DIQRSOLGTM</span>
+        </div>
+
+        <div class="form-row">
+            <label>Tipo de transferência</label>
+            <span>PIX</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="form-group-title">Informações do depositante</div>
+
+        <div class="form-row">
+            <label>Nome</label>
+            <span>Univebet Gaming Ltda</span>
+        </div>
+
+        <div class="form-row">
+            <label>CNPJ</label>
+            <span>64663535000125</span>
+        </div>
+
+        <div class="form-row">
+            <label>Banco/Instituição</label>
+            <span>50871921</span>
+        </div>
+
+        <div class="divider"></div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-group-title">Informações do destino</div>
+
+        <div class="form-row">
+            <label>Nome</label>
+            <span id="targetName">Jose Rodrigues Meneses</span>
+        </div>
+
+        <div class="form-row">
+            <label>CPF/CNPJ</label>
+            <span>17649476812</span>
+        </div>
+
+        <div class="form-row">
+            <label>AGÊNCIA</label>
+            <span>10573521</span>
+        </div>
+
+        <div class="form-row">
+            <label>ISPB Nome:</label>
+            <span>MERCADO PAGO IP LTDA.</span>
+        </div>
+
+        <div class="form-row">
+            <label>Chave</label>
+            <span>+5511981760984</span>
+        </div>
+
+        <div class="form-row">
+            <label>Tipo de Conta</label>
+            <span>PHONE</span>
+        </div>
+
+        <div class="divider"></div>
+    </div>
+</div>
+
+<script>
+function generate(){
+
+    let amount = document.getElementById("inputAmount").value || "62.00";
+    let time = document.getElementById("inputTime").value || "13/04/2026 01:34";
+    let name = document.getElementById("inputName").value || "Jose Rodrigues Meneses";
+
+    // 金额格式
+    document.getElementById("formattedAmount").innerText = "R$ " + amount.replace(".", ",");
+
+    // 时间直接写入（不再被JS覆盖）
+    document.getElementById("transactionTime").innerText = time;
+
+    // 姓名
+    document.getElementById("targetName").innerText = name;
+}
+</script>
+
+</body>
+</html>
