@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+
+<!-- ✅ 关键：iPhone安全区支持 -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Telegram无敌截图版</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+body{
+    margin:0;
+    background:#e5e7eb;
+    font-family:-apple-system,BlinkMacSystemFont;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+/* ===== 手机容器 ===== */
+.phone{
+    position:relative;
+    width:420px;
+}
+
+/* ===== 屏幕（真正截图区域） ===== */
+.screen{
+    position:absolute;
+    top:28px;
+    left:22px;
+    width:376px;
+    height:812px;
+
+    border-radius:44px;
+    overflow:hidden;
+    background:#f5f5f5;
+}
+
+/* ===== 刘海（关键） ===== */
+.notch{
+    position:absolute;
+    top:8px;
+    left:50%;
+    transform:translateX(-50%);
+    width:160px;
+    height:32px;
+    background:#000;
+    border-radius:20px;
+    z-index:5;
+}
+
+/* ===== 状态栏 ===== */
+.status{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 16px;
+    font-weight:600;
+    font-size:14px;
+}
+
+.right{
+    display:flex;
+    gap:6px;
+    align-items:center;
+}
+
+/* 信号 */
+.signal span{
+    display:inline-block;
+    width:3px;
+    margin-left:1px;
+    background:#000;
+}
+.signal span:nth-child(1){height:4px}
+.signal span:nth-child(2){height:6px}
+.signal span:nth-child(3){height:8px}
+.signal span:nth-child(4){height:10px}
+
+/* 电池 */
+.battery{
+    width:22px;
+    height:10px;
+    border:1px solid #000;
+    border-radius:2px;
+    position:relative;
+}
+.battery::after{
+    content:"";
+    position:absolute;
+    right:-3px;
+    top:2px;
+    width:2px;
+    height:4px;
+    background:#000;
+}
+.level{
+    height:100%;
+    width:80%;
+    background:#000;
+}
+
+/* Safari栏 */
+.url{
+    margin:6px 16px;
+    padding:6px;
+    border-radius:10px;
+    background:#e5e7eb;
+    text-align:center;
+    font-size:12px;
+}
+
+/* ===== 账单 ===== */
+.card{
+    margin:10px;
+    padding:16px;
+    background:#fff;
+    border-radius:20px;
+}
+
+.title{
+    text-align:center;
+    font-weight:700;
+    margin:12px 0;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    margin:10px 0;
+    font-size:13px;
+}
+
+/* ===== 手机壳（覆盖） ===== */
+.frame{
+    width:100%;
+    position:relative;
+    z-index:10;
+    pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+    <!-- 屏幕 -->
+    <div class="screen" id="capture">
+
+        <div class="notch"></div>
+
+        <div class="status">
+            <span id="time">09:41</span>
+
+            <div class="right">
+                <div class="signal">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <span>5G</span>
+
+                <div class="battery">
+                    <div class="level" id="battery"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="url">uspay.univepay.com</div>
+
+        <!-- 账单 -->
+        <div class="card">
+            <div class="title">comprovante de transacção</div>
+
+            <div class="row">
+                <span>Valor</span>
+                <span id="amount">R$ 62,00</span>
+            </div>
+
+            <div class="row">
+                <span>Tempo</span>
+                <span id="time2">13/04/2026 01:34</span>
+            </div>
+
+            <div class="row">
+                <span>Tipo</span>
+                <span>PIX</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ⚠️ 你的手机壳（替换路径） -->
+    <img src="iphone.png" class="frame">
+
+</div>
+
+<!-- 按钮 -->
+<div style="position:fixed;bottom:30px">
+<button onclick="shot()">下载截图</button>
+</div>
+
+<script>
+
+/* 截图（只截屏幕） */
+function shot(){
+    html2canvas(document.getElementById("capture"),{
+        scale:3,
+        useCORS:true
+    }).then(canvas=>{
+        let link=document.createElement("a");
+        link.download="iphone.png";
+        link.href=canvas.toDataURL();
+        link.click();
+    });
+}
+
+</script>
+
+</body>
+</html>
