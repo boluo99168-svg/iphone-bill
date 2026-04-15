@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N26 Transaktion</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+
+body {
+  background: #1a1a1a;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 40px 30px;
+  gap: 36px;
+  flex-wrap: wrap;
+}
+
+/* ===== Control Panel ===== */
+.control-panel {
+  width: 280px;
+  background: #2a2a2e;
+  border-radius: 20px;
+  padding: 22px 18px;
+  border: 1px solid #3a3a3c;
+  flex-shrink: 0;
+  margin-top: 10px;
+}
+.control-panel h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.control-panel .sub {
+  font-size: 11px;
+  color: #636366;
+  margin-bottom: 18px;
+  padding-left: 10px;
+  border-left: 3px solid #3ecfbf;
+}
+.input-field { margin-bottom: 13px; }
+.input-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #aeaeb2;
+  margin-bottom: 5px;
+}
+.control-panel input,
+.control-panel select {
+  width: 100%;
+  padding: 10px 12px;
+  background: #1c1c1e;
+  border: 1px solid #3a3a3c;
+  border-radius: 10px;
+  font-size: 13px;
+  color: #fff;
+  outline: none;
+  font-family: inherit;
+}
+.control-panel input:focus {
+  border-color: #3ecfbf;
+  box-shadow: 0 0 0 3px rgba(62,207,191,0.2);
+}
+.btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-primary { background: #3ecfbf; color: #111; }
+.btn-dark { background: #3a3a3c; color: #fff; }
+
+/* ===== Phone Frame ===== */
+.phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ===== Capture Area - exact phone screen ===== */
+#captureArea {
+  width: 390px;
+  background: #111111;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== iOS Status Bar ===== */
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 22px 6px 28px;
+  background: #111111;
+}
+.sb-time {
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.2px;
+}
+.sb-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+/* Signal bars */
+.signal {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+.signal span {
+  display: block;
+  width: 3px;
+  border-radius: 1px;
+  background: #fff;
+}
+.signal span:nth-child(1) { height: 4px; opacity: 0.4; }
+.signal span:nth-child(2) { height: 7px; opacity: 0.4; }
+.signal span:nth-child(3) { height: 10px; }
+.signal span:nth-child(4) { height: 13px; }
+
+/* WiFi icon - SVG inline */
+.wifi-icon {
+  width: 17px;
+  height: 13px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.wifi-icon svg { width: 17px; height: 13px; }
+
+/* Battery with percentage */
+.battery-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.batt-pct {
+  font-size: 13px;
+  font-weight: 500;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.batt-icon {
+  position: relative;
+  width: 25px;
+  height: 13px;
+  border: 1.5px solid rgba(255,255,255,0.65);
+  border-radius: 3.5px;
+}
+.batt-icon::after {
+  content: '';
+  position: absolute;
+  right: -4.5px;
+  top: 3px;
+  width: 2.5px;
+  height: 5px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 0 1px 1px 0;
+}
+.batt-fill {
+  position: absolute;
+  left: 1.5px;
+  top: 1.5px;
+  height: calc(100% - 3px);
+  border-radius: 1.5px;
+  background: #fff;
+  transition: width 0.2s;
+}
+.batt-fill.red { background: #ff3b30; }
+
+/* ===== Back button row ===== */
+.back-row {
+  display: flex;
+  align-items: center;
+  padding: 2px 20px 8px 18px;
+  background: #111111;
+}
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 16px;
+  color: #fff;
+  font-weight: 400;
+}
+.back-btn svg {
+  width: 10px;
+  height: 16px;
+  margin-right: 1px;
+}
+
+/* ===== Scrollable content ===== */
+.screen-content {
+  background: #111111;
+  padding: 0 0 24px 0;
+}
+
+/* ===== Chevron ===== */
+.chevron-row {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 14px 0;
+}
+.chevron-row svg {
+  width: 22px;
+  height: 22px;
+  color: #636366;
+}
+
+/* ===== Header ===== */
+.txn-name {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 0 22px;
+  line-height: 1.15;
+  margin-bottom: 10px;
+}
+.txn-amount {
+  font-size: 42px;
+  font-weight: 700;
+  color: #3ecfbf;
+  padding: 0 22px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+.txn-date {
+  font-size: 14px;
+  color: #636366;
+  padding: 0 22px;
+  margin-bottom: 24px;
+}
+
+/* ===== Action Buttons ===== */
+.action-row {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 16px;
+  margin-bottom: 32px;
+}
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 30%;
+}
+.action-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.action-icon.teal { background: #3ecfbf; }
+.action-icon.dark { background: #2a2a2e; border: 1.5px solid #3a3a3c; }
+.action-label {
+  font-size: 12px;
+  color: #aeaeb2;
+  text-align: center;
+  line-height: 1.25;
+}
+
+/* ===== Section header ===== */
+.section-header {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  padding: 0 22px;
+  margin-bottom: 12px;
+}
+
+/* ===== Detail card ===== */
+.detail-card {
+  background: #1c1c1e;
+  border-radius: 16px;
+  margin: 0 16px 24px 16px;
+  overflow: hidden;
+}
+.detail-row {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #2a2a2c;
+  gap: 14px;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.detail-icon.gray { background: #3a3a3c; }
+.detail-icon.teal { background: #3ecfbf; }
+.detail-text { flex: 1; }
+.detail-label {
+  font-size: 12px;
+  color: #636366;
+  margin-bottom: 2px;
+}
+.detail-value {
+  font-size: 15px;
+  color: #ffffff;
+  font-weight: 400;
+}
+.detail-arrow {
+  color: #636366;
+  font-size: 16px;
+}
+.detail-copy {
+  color: #636366;
+}
+.detail-copy svg { width: 18px; height: 18px; }
+
+/* ===== Notizen card ===== */
+.notiz-card {
+  background: #1c1c1e;
+  border-radius: 16px;
+  margin: 0 16px 24px 16px;
+  overflow: hidden;
+}
+.notiz-row {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 14px;
+}
+.notiz-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #3a3a3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.notiz-text {
+  flex: 1;
+  font-size: 15px;
+  color: #ffffff;
+}
+.notiz-arrow {
+  font-size: 16px;
+  color: #636366;
+}
+
+/* ===== Tags ===== */
+.tags-section {
+  padding: 0 22px;
+  margin-bottom: 32px;
+}
+.tags-empty {
+  font-size: 14px;
+  color: #636366;
+  margin-top: 6px;
+}
+
+/* ===== Home indicator ===== */
+.home-indicator {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 8px 0;
+  background: #111111;
+}
+.home-bar {
+  width: 134px;
+  height: 5px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+
+<!-- Control Panel -->
+<div class="control-panel">
+  <h3>N26 交易截图工具</h3>
+  <div class="sub">像素级还原 · 暗色模式</div>
+
+  <div class="input-field">
+    <label>👤 收款人姓名</label>
+    <input type="text" id="inp_name" value="Esteban Cuerva De La Fuente">
+  </div>
+  <div class="input-field">
+    <label>💰 金额（如：75,00 €）</label>
+    <input type="text" id="inp_amount" value="75,00 €">
+  </div>
+  <div class="input-field">
+    <label>📅 交易日期</label>
+    <input type="text" id="inp_date" value="Mittwoch, 2. April 2025, 14:16">
+  </div>
+  <div class="input-field">
+    <label>🏷️ 类别（Kategorie）</label>
+    <input type="text" id="inp_kategorie" value="Gutschriften">
+  </div>
+  <div class="input-field">
+    <label>🏦 收款账户（Zu）</label>
+    <input type="text" id="inp_zu" value="Hauptkonto">
+  </div>
+  <div class="input-field">
+    <label>🔄 交易类型（Transaktionstyp）</label>
+    <input type="text" id="inp_type" value="Echtzeitüberweisung">
+  </div>
+  <div class="input-field">
+    <label>📝 用途备注（Verwendungszweck）</label>
+    <input type="text" id="inp_zweck" value="1">
+  </div>
+  <div class="input-field">
+    <label>◀ 返回按钮文字</label>
+    <input type="text" id="inp_back" value="TikTok">
+  </div>
+  <div class="input-field">
+    <label>🕐 状态栏时间</label>
+    <input type="text" id="inp_time" value="14:16">
+  </div>
+  <div class="input-field">
+    <label>🔋 电池电量（%）</label>
+    <input type="number" id="inp_batt" min="0" max="100" value="59">
+  </div>
+  <div class="input-field">
+    <label>📶 网络类型</label>
+    <select id="inp_net">
+      <option value="4G">4G</option>
+      <option value="5G">5G</option>
+      <option value="LTE" selected>LTE</option>
+      <option value="3G">3G</option>
+    </select>
+  </div>
+
+  <button class="btn btn-primary" onclick="refresh()">✨ 更新预览</button>
+  <button class="btn btn-dark" onclick="doScreenshot()">📸 导出 4K 截图</button>
+</div>
+
+<!-- Phone Screen -->
+<div class="phone-wrap">
+  <div id="captureArea">
+
+    <!-- iOS Status Bar -->
+    <div class="status-bar">
+      <span class="sb-time" id="el_time">14:16</span>
+      <div class="sb-right">
+        <!-- Signal -->
+        <div class="signal">
+          <span></span><span></span><span></span><span></span>
+        </div>
+        <!-- WiFi -->
+        <svg width="17" height="13" viewBox="0 0 17 13" fill="none">
+          <path d="M8.5 10.5a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2z" fill="white"/>
+          <path d="M5.1 7.6a4.8 4.8 0 0 1 6.8 0" stroke="white" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.9"/>
+          <path d="M2.2 4.7a8.5 8.5 0 0 1 12.6 0" stroke="white" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.5"/>
+        </svg>
+        <!-- Battery % + icon -->
+        <div class="battery-wrap">
+          <span class="batt-pct" id="el_batt_pct">59</span>
+          <div class="batt-icon">
+            <div class="batt-fill" id="el_batt_fill" style="width:13px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back button -->
+    <div class="back-row">
+      <div class="back-btn">
+        <svg viewBox="0 0 10 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8.5 1.5L2 8l6.5 6.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span id="el_back">TikTok</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="screen-content">
+
+      <!-- Chevron -->
+      <div class="chevron-row">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#636366" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
+      <!-- Name -->
+      <div class="txn-name" id="el_name">Esteban Cuerva De La Fuente</div>
+
+      <!-- Amount -->
+      <div class="txn-amount" id="el_amount">75,00 €</div>
+
+      <!-- Date -->
+      <div class="txn-date" id="el_date">Mittwoch, 2. April 2025, 14:16</div>
+
+      <!-- Action buttons -->
+      <div class="action-row">
+        <!-- Space senden -->
+        <div class="action-btn">
+          <div class="action-icon teal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="7" height="7" rx="1.5" fill="#111" opacity="0.8"/>
+              <rect x="14" y="3" width="7" height="7" rx="1.5" fill="#111" opacity="0.8"/>
+              <rect x="3" y="14" width="7" height="7" rx="1.5" fill="#111" opacity="0.8"/>
+              <rect x="14" y="14" width="7" height="7" rx="1.5" fill="#111" opacity="0.8"/>
+            </svg>
+          </div>
+          <div class="action-label">Geld an einen Space senden</div>
+        </div>
+        <!-- Einkommensverteiler -->
+        <div class="action-btn">
+          <div class="action-icon dark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 3 21 3 21 8"></polyline>
+              <line x1="4" y1="20" x2="21" y2="3"></line>
+              <polyline points="21 16 21 21 16 21"></polyline>
+              <line x1="15" y1="15" x2="21" y2="21"></line>
+            </svg>
+          </div>
+          <div class="action-label">Einkommensverteiler</div>
+        </div>
+        <!-- Zum Support -->
+        <div class="action-btn">
+          <div class="action-icon dark">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div class="action-label">Zum Support</div>
+        </div>
+      </div>
+
+      <!-- Details section -->
+      <div class="section-header">Details</div>
+      <div class="detail-card">
+
+        <!-- Kategorie -->
+        <div class="detail-row">
+          <div class="detail-icon gray">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aeaeb2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Kategorie</div>
+            <div class="detail-value" id="el_kategorie">Gutschriften</div>
+          </div>
+          <div class="detail-arrow">›</div>
+        </div>
+
+        <!-- Zu -->
+        <div class="detail-row">
+          <div class="detail-icon teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="3" width="18" height="18" rx="3" fill="#111" opacity="0.5"/>
+              <text x="12" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#111" font-family="-apple-system">N26</text>
+            </svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Zu</div>
+            <div class="detail-value" id="el_zu">Hauptkonto</div>
+          </div>
+        </div>
+
+        <!-- Transaktionstyp -->
+        <div class="detail-row">
+          <div class="detail-icon gray">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aeaeb2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Transaktionstyp</div>
+            <div class="detail-value" id="el_type">Echtzeitüberweisung</div>
+          </div>
+        </div>
+
+        <!-- Verwendungszweck -->
+        <div class="detail-row">
+          <div class="detail-icon gray">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aeaeb2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <div class="detail-text">
+            <div class="detail-label">Verwendungszweck</div>
+            <div class="detail-value" id="el_zweck">1</div>
+          </div>
+          <div class="detail-copy">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#636366" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Notizen section -->
+      <div class="section-header">Notizen</div>
+      <div class="notiz-card">
+        <div class="notiz-row">
+          <div class="notiz-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#aeaeb2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <div class="notiz-text">Notiz hinzufügen</div>
+          <div class="notiz-arrow">›</div>
+        </div>
+      </div>
+
+      <!-- Tags section -->
+      <div class="section-header">Tags</div>
+
+    </div>
+
+    <!-- Home indicator -->
+    <div class="home-indicator">
+      <div class="home-bar"></div>
+    </div>
+
+  </div><!-- /captureArea -->
+</div>
+
+<script>
+function refresh() {
+  // Name
+  document.getElementById('el_name').textContent = document.getElementById('inp_name').value || 'Esteban Cuerva De La Fuente';
+  // Amount
+  document.getElementById('el_amount').textContent = document.getElementById('inp_amount').value || '75,00 €';
+  // Date
+  document.getElementById('el_date').textContent = document.getElementById('inp_date').value || '';
+  // Kategorie
+  document.getElementById('el_kategorie').textContent = document.getElementById('inp_kategorie').value || 'Gutschriften';
+  // Zu
+  document.getElementById('el_zu').textContent = document.getElementById('inp_zu').value || 'Hauptkonto';
+  // Type
+  document.getElementById('el_type').textContent = document.getElementById('inp_type').value || 'Echtzeitüberweisung';
+  // Zweck
+  document.getElementById('el_zweck').textContent = document.getElementById('inp_zweck').value || '1';
+  // Back
+  document.getElementById('el_back').textContent = document.getElementById('inp_back').value || 'TikTok';
+  // Status time
+  document.getElementById('el_time').textContent = document.getElementById('inp_time').value || '14:16';
+  // Battery
+  let pct = parseInt(document.getElementById('inp_batt').value);
+  if (isNaN(pct)) pct = 59;
+  pct = Math.max(0, Math.min(100, pct));
+  document.getElementById('el_batt_pct').textContent = pct;
+  // Fill: max inner width ~20px
+  let fill = Math.round((pct / 100) * 20);
+  let fillEl = document.getElementById('el_batt_fill');
+  fillEl.style.width = Math.max(1, fill) + 'px';
+  if (pct <= 20) {
+    fillEl.classList.add('red');
+  } else {
+    fillEl.classList.remove('red');
+  }
+}
+
+async function doScreenshot() {
+  const btn = document.querySelector('.btn-dark');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ 生成中…';
+  btn.disabled = true;
+  refresh();
+  await new Promise(r => setTimeout(r, 120));
+  try {
+    const canvas = await html2canvas(document.getElementById('captureArea'), {
+      scale: 4,
+      backgroundColor: '#111111',
+      logging: false,
+      useCORS: true
+    });
+    const a = document.createElement('a');
+    a.download = 'n26_transaction.png';
+    a.href = canvas.toDataURL('image/png', 1.0);
+    a.click();
+  } catch(e) {
+    alert('截图失败，请刷新后重试');
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
+}
+
+// Auto-refresh on any input change
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', refresh);
+  el.addEventListener('change', refresh);
+});
+
+refresh();
+</script>
+</body>
+</html>
