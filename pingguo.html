@@ -33,7 +33,6 @@ body {
     width: 100%;
 }
 
-/* 控制面板 */
 .control-panel {
     width: 280px;
     background: rgba(255, 255, 255, 0.96);
@@ -126,14 +125,14 @@ body {
     border: 1px solid #3a3a3c;
 }
 
-/* ===== 用户提供的灵动岛样式（完整1:1风格） ===== */
+/* ===== 灵动岛（宽度130px，其他样式完整） ===== */
 .dynamic-island {
     position: absolute;
     top: 12px;
     left: 50%;
     transform: translateX(-50%);
     
-    width: 126px;
+    width: 130px;          /* 用户要求从126px改为130px */
     height: 30px;
     
     background: rgba(0, 0, 0, 0.92);
@@ -220,46 +219,50 @@ body {
     overflow-y: visible;
 }
 
-/* 状态栏：时间在左，信号电池在右（无背景条） */
+/* ----- 状态栏（绝对定位布局，符合用户最新要求）----- */
 .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 24px 6px 24px;
-    padding-top: 14px;   /* 用户要求增加顶部内边距，避免被灵动岛遮挡 */
-    font-size: 16px;
-    font-weight: 590;
-    background: transparent;
-    color: #111;
-    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
-    letter-spacing: -0.2px;
     position: relative;
-    z-index: 20;
+    height: 44px;
+    padding: 16px 22px 0 22px;   /* 上16 左右22 下0 */
+    background: transparent;
+    z-index: 60;
 }
-.time-text { 
-    font-weight: 600; 
+
+/* 左侧时间 */
+.time-text {
+    position: absolute;
+    left: 22px;
+    top: 16px;
+    font-weight: 600;
     font-size: 16px;
     letter-spacing: -0.3px;
     color: #111;
-    background: transparent;
-    padding: 0 4px;
+    z-index: 2;
 }
-.right-icons { 
-    display: flex; 
-    align-items: center; 
-    gap: 8px; 
+
+/* 右侧图标组 */
+.right-icons {
+    position: absolute;
+    right: 22px;
+    top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;          /* 用户要求加大间隙至6px */
+    margin-right: 0;
 }
+
+/* 信号条 */
 .signal {
     display: flex;
     align-items: flex-end;
-    gap: 2.5px;
-    margin-right: 2px;
+    gap: 2px;
+    margin-right: 0;
 }
 .signal span {
-    width: 3.8px;
+    width: 3px;               /* 用户要求宽度3px */
     background: #1c1c1e;
     display: block;
-    border-radius: 1.2px;
+    border-radius: 0.8px;     /* 圆角0.8px */
 }
 .signal span:nth-child(1) { height: 5px; }
 .signal span:nth-child(2) { height: 8px; }
@@ -271,18 +274,19 @@ body {
     font-weight: 600;
     letter-spacing: -0.2px;
     color: #1c1c1e;
-    margin-left: 2px;
+    transform: translateY(-1px);   /* 垂直微调 */
 }
 
+/* 电池区域 */
 .battery-svg-container {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-left: 4px;
+    margin-left: 0;
 }
 .battery-svg {
-    width: 24px;
-    height: 12px;
+    width: 22px;    /* 用户要求宽度22px */
+    height: 11px;   /* 高度11px */
     display: flex;
     align-items: center;
 }
@@ -403,7 +407,7 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             <button class="btn" id="updateBtn">✨ Atualizar comprovante</button>
             <button class="btn btn-outline" id="screenshotBtn">📸 Baixar screenshot</button>
         </div>
-        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Dynamic Island 1:1 style | 硬件开孔 | 玻璃质感</div>
+        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Dynamic Island 130px | Status Bar absolute layout</div>
     </div>
 
     <div class="phone-container" id="captureArea">
@@ -412,10 +416,10 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             <div class="vol-up"></div>
             <div class="vol-down"></div>
             <div class="power"></div>
-            <!-- 灵动岛独立元素（用户提供的完整样式） -->
             <div class="dynamic-island"></div>
             <div class="phone-screen">
                 <div class="screen-inner">
+                    <!-- 状态栏：绝对定位布局 -->
                     <div class="top-bar">
                         <span class="time-text" id="phoneTime">14:11</span>
                         <div class="right-icons">
@@ -509,23 +513,23 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
 </div>
 
 <script>
-    // 生成 Apple 风格电池 SVG
+    // 生成 Apple 风格电池 SVG（适配 22x11 尺寸）
     function getBatterySVG(percent, isLow) {
         const fillPercent = Math.min(100, Math.max(0, percent));
-        const shellWidth = 24;
-        const shellHeight = 12;
+        const shellWidth = 22;
+        const shellHeight = 11;
         const fillWidth = (fillPercent / 100) * (shellWidth - 5);
-        const fillX = 2.5;
-        const fillY = 2;
-        const fillHeight = shellHeight - 4;
+        const fillX = 2;
+        const fillY = 1.5;
+        const fillHeight = shellHeight - 3;
         
         const strokeColor = isLow ? "#ff453a" : "#3a3a3c";
         const fillColor = isLow ? "#ff453a" : "#1c1c1e";
         
-        return `<svg width="24" height="12" viewBox="0 0 24 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0.8" y="0.8" width="21.2" height="10.4" rx="2.6" stroke="${strokeColor}" stroke-width="0.9" fill="none"/>
-            <rect x="22.4" y="3.8" width="1.4" height="4.4" rx="0.6" fill="${strokeColor}"/>
-            <rect x="${fillX}" y="${fillY}" width="${Math.max(1.2, fillWidth)}" height="${fillHeight}" rx="1.2" fill="${fillColor}"/>
+        return `<svg width="22" height="11" viewBox="0 0 22 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.6" y="0.6" width="19.6" height="9.8" rx="2.4" stroke="${strokeColor}" stroke-width="0.8" fill="none"/>
+            <rect x="20.6" y="3.2" width="1.2" height="4.6" rx="0.5" fill="${strokeColor}"/>
+            <rect x="${fillX}" y="${fillY}" width="${Math.max(1, fillWidth)}" height="${fillHeight}" rx="1" fill="${fillColor}"/>
         </svg>`;
     }
     
@@ -540,7 +544,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         else widget.classList.remove('battery-low');
     }
 
-    // DOM 元素
     const amountInput = document.getElementById('amountInput');
     const timeInput = document.getElementById('timeInput');
     const favorecidoInput = document.getElementById('favorecidoInput');
@@ -609,7 +612,7 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             await new Promise(r => setTimeout(r, 80));
             
             const canvas = await html2canvas(target, {
-                scale: 3.5,          // 用户要求的高分辨率截图
+                scale: 3.5,
                 backgroundColor: null,
                 useCORS: true,
                 logging: false,
