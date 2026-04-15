@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>iPhone 16 Pro Max · Comprovante Bancário</title>
+<title>iPhone 16 · Comprovante Bancário · Screenshot</title>
 <!-- html2canvas para captura ultra HD -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
@@ -39,6 +39,7 @@ body.dark-mode {
 body {
     background: #e5e5ea;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -148,87 +149,17 @@ body.dark-mode .control-panel select {
     transform: translateY(-1px);
 }
 
-/* ========= iPhone 16 Pro Max 完全仿真外壳 ========= */
-.iphone-16-promax {
-    position: relative;
-    width: 402px;
-    background: #1c1c1e;
-    border-radius: 52px;
-    box-shadow: 0 0 0 6px #3a3a3c, 0 30px 40px -15px rgba(0, 0, 0, 0.5);
-    padding: 10px 8px;
-}
-body.dark-mode .iphone-16-promax {
-    box-shadow: 0 0 0 6px #2a2a2c, 0 30px 40px -15px rgba(0, 0, 0, 0.8);
-}
-
-/* 动态岛 (Dynamic Island) */
-.dynamic-island {
-    position: absolute;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 108px;
-    height: 33px;
-    background: #000;
-    border-radius: 24px;
-    z-index: 30;
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.08), 0 2px 8px rgba(0,0,0,0.3);
-}
-
-/* 物理按键 */
-.iphone-16-promax .vol-up {
-    position: absolute;
-    left: -4px;
-    top: 100px;
-    width: 4px;
-    height: 32px;
-    background: #2a2a2c;
-    border-radius: 4px 0 0 4px;
-    z-index: 15;
-}
-.iphone-16-promax .vol-down {
-    position: absolute;
-    left: -4px;
-    top: 142px;
-    width: 4px;
-    height: 32px;
-    background: #2a2a2c;
-    border-radius: 4px 0 0 4px;
-    z-index: 15;
-}
-.iphone-16-promax .power {
-    position: absolute;
-    right: -4px;
-    top: 120px;
-    width: 4px;
-    height: 48px;
-    background: #2a2a2c;
-    border-radius: 0 4px 4px 0;
-    z-index: 15;
-}
-.iphone-16-promax .action-btn {
-    position: absolute;
-    left: -4px;
-    top: 60px;
-    width: 4px;
-    height: 28px;
-    background: #2a2a2c;
-    border-radius: 4px 0 0 4px;
-    z-index: 15;
-}
-
-/* 屏幕内容区域 */
-.screen-content {
+/* ===== Área de screenshot - APENAS CONTEÚDO (sem moldura) ===== */
+.screenshot-area {
+    width: 390px;
     background: var(--bg-screen);
-    border-radius: 48px;
-    width: 100%;
-    height: 100%;
+    border-radius: 0;
     overflow: hidden;
-    position: relative;
+    box-shadow: none;
     transition: background 0.3s;
 }
 
-/* ===== iOS 状态栏 completa (原生样式) ===== */
+/* ===== iOS 状态栏 (原生样式) ===== */
 .status-bar {
     display: flex;
     justify-content: space-between;
@@ -248,7 +179,7 @@ body.dark-mode .iphone-16-promax {
     align-items: center;
     gap: 6px;
 }
-/* Signal bars - 5 barras para Pro Max */
+/* Signal bars */
 .signal {
     display: flex;
     align-items: flex-end;
@@ -264,44 +195,52 @@ body.dark-mode .iphone-16-promax {
 .signal span:nth-child(2) { height: 7px; }
 .signal span:nth-child(3) { height: 10px; }
 .signal span:nth-child(4) { height: 12px; }
-.signal span:nth-child(5) { height: 14px; width: 3.5px; background: var(--status-color); border-radius: 1px; }
 
-/* Battery */
+/* ===== 电池图标 (真实iOS样式) ===== */
 .battery {
     display: flex;
     align-items: center;
     margin-left: 2px;
 }
 .battery-box {
-    width: 24px;
+    width: 25px;
     height: 12px;
-    border: 1.2px solid var(--battery-border);
-    border-radius: 4px;
+    border: 1px solid #8e8e93;
+    border-radius: 3.5px;
     position: relative;
     background: transparent;
 }
 .battery-box::after {
     content: '';
     position: absolute;
-    right: -3.5px;
-    top: 3px;
-    width: 2.5px;
-    height: 5px;
-    background: var(--battery-border);
-    border-radius: 1px;
+    right: -2.5px;
+    top: 3.5px;
+    width: 1.5px;
+    height: 4px;
+    background: #8e8e93;
+    border-radius: 0.5px;
 }
 .battery-level {
-    height: 100%;
-    background: var(--battery-border);
-    border-radius: 2px;
-    width: 80%;
+    position: absolute;
+    left: 1.5px;
+    top: 1.5px;
+    height: 7px;
+    border-radius: 1.5px;
+    background: #1c1c1e;
+    width: calc(80% - 2px);
     transition: width 0.1s ease, background 0.2s;
 }
 .battery-low .battery-level {
-    background: #e34d4d !important;
+    background: #ff3b30 !important;
+}
+.battery-low .battery-box {
+    border-color: #ff3b30;
+}
+.battery-low .battery-box::after {
+    background: #ff3b30;
 }
 
-/* ===== Conteúdo bancário (bank-grade UI) ===== */
+/* ===== Conteúdo bancário ===== */
 .card {
     background: var(--card-bg);
     margin: 8px 16px 24px 16px;
@@ -337,10 +276,11 @@ body.dark-mode .iphone-16-promax {
     transition: all 0.2s ease;
 }
 .status-ok {
-    color: #7a7a7a;
+    color: #2e7d32 !important;
+    font-weight: 600;
 }
 body.dark-mode .status-ok {
-    color: #98989e;
+    color: #4caf50 !important;
 }
 .id {
     font-size: 11px;
@@ -348,19 +288,6 @@ body.dark-mode .status-ok {
     word-break: break-all;
     white-space: normal;
     font-family: monospace;
-}
-
-/* Home Indicator (barra inferior do iPhone) */
-.home-bar {
-    width: 140px;
-    height: 5px;
-    background: #000;
-    border-radius: 3px;
-    margin: 10px auto 8px;
-    opacity: 0.7;
-}
-body.dark-mode .home-bar {
-    background: #fff;
 }
 
 /* Animações */
@@ -383,8 +310,8 @@ body.dark-mode .home-bar {
 <div class="dashboard">
     <!-- Painel de controle -->
     <div class="control-panel">
-        <h3>📱 iPhone 16 Pro Max</h3>
-        <div class="sub">Comprovante · 1:1 Clone</div>
+        <h3>📱 iPhone 16 Native</h3>
+        <div class="sub">Screenshot puro · sem moldura</div>
         
         <div class="input-field">
             <label>💰 VALOR (R$)</label>
@@ -422,93 +349,79 @@ body.dark-mode .home-bar {
             <button class="btn" id="updateBtn">✨ Atualizar comprovante</button>
             <button class="btn btn-outline" id="screenshotBtn">📸 Exportar screenshot 4K</button>
         </div>
-        <div class="sub" style="margin-top: 16px; font-size: 10px;">✔ Dynamic Island | Botões físicos | Bank UI</div>
+        <div class="sub" style="margin-top: 16px; font-size: 10px;">✔ Sem moldura · Apenas conteúdo iOS nativo</div>
     </div>
 
-    <!-- iPhone 16 Pro Max 完全仿真外壳 + 屏幕内容 -->
-    <div id="captureArea" class="iphone-16-promax">
-        <!-- Botões físicos -->
-        <div class="action-btn"></div>
-        <div class="vol-up"></div>
-        <div class="vol-down"></div>
-        <div class="power"></div>
-        <!-- Dynamic Island -->
-        <div class="dynamic-island"></div>
-        
-        <!-- Conteúdo da tela -->
-        <div class="screen-content">
-            <!-- Status Bar iOS nativa (sem duplicar island) -->
-            <div class="status-bar">
-                <span class="time" id="phoneTime">14:11</span>
-                <div class="status-icons">
-                    <div class="signal">
-                        <span></span><span></span><span></span><span></span><span></span>
-                    </div>
-                    <span style="font-size:12px;">5G</span>
-                    <div class="battery" id="batteryWidget">
-                        <div class="battery-box">
-                            <div class="battery-level" id="batteryLevelFill"></div>
-                        </div>
+    <!-- Área de screenshot - SEM MOLDURA -->
+    <div id="captureArea" class="screenshot-area">
+        <!-- Status Bar iOS nativa -->
+        <div class="status-bar">
+            <span class="time" id="phoneTime">14:11</span>
+            <div class="status-icons">
+                <div class="signal">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <span style="font-size:12px;">5G</span>
+                <div class="battery" id="batteryWidget">
+                    <div class="battery-box">
+                        <div class="battery-level" id="batteryLevelFill"></div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Comprovante bancário -->
-            <div class="card">
-                <div class="title">COMPROVANTE DE TRANSAÇÃO BANCÁRIA</div>
-                <div class="line"></div>
+        <!-- Comprovante bancário -->
+        <div class="card">
+            <div class="title">COMPROVANTE DE TRANSAÇÃO BANCÁRIA</div>
+            <div class="line"></div>
 
-                <div class="label">SITUAÇÃO:</div>
-                <div class="value status-ok">EFETIVADO</div>
+            <div class="label">SITUAÇÃO:</div>
+            <div class="value status-ok">EFETIVADO</div>
 
-                <div class="label">REALIZADO EM:</div>
-                <div class="value" id="timeDisplay">12/04/2026 14:11:39</div>
+            <div class="label">REALIZADO EM:</div>
+            <div class="value" id="timeDisplay">12/04/2026 14:11:39</div>
 
-                <div class="label">VALOR:</div>
-                <div class="value" id="amountDisplay">200,00</div>
+            <div class="label">VALOR:</div>
+            <div class="value" id="amountDisplay">200,00</div>
 
-                <div class="label">TIPO DE TRANSFERÊNCIA:</div>
-                <div class="value">PIX</div>
+            <div class="label">TIPO DE TRANSFERÊNCIA:</div>
+            <div class="value">PIX</div>
 
-                <div class="line"></div>
+            <div class="line"></div>
 
-                <div class="label">NOME DO DEPOSITANTE:</div>
-                <div class="value">-</div>
+            <div class="label">NOME DO DEPOSITANTE:</div>
+            <div class="value">-</div>
 
-                <div class="label">CNPJ:</div>
-                <div class="value">6000392</div>
+            <div class="label">CNPJ:</div>
+            <div class="value">6000392</div>
 
-                <div class="label">Banco/Instituição:</div>
-                <div class="value">6000392</div>
+            <div class="label">Banco/Instituição:</div>
+            <div class="value">6000392</div>
 
-                <div class="line"></div>
+            <div class="line"></div>
 
-                <div class="label">NOME DO FAVORECIDO:</div>
-                <div class="value" id="favorecidoDisplay">GABRIEL HIDEKI SUYAMA</div>
+            <div class="label">NOME DO FAVORECIDO:</div>
+            <div class="value" id="favorecidoDisplay">GABRIEL HIDEKI SUYAMA</div>
 
-                <div class="label">CPF/CNPJ:</div>
-                <div class="value">12521386952</div>
+            <div class="label">CPF/CNPJ:</div>
+            <div class="value">12521386952</div>
 
-                <div class="label">Pix Para Beneficiário:</div>
-                <div class="value">12521386952</div>
+            <div class="label">Pix Para Beneficiário:</div>
+            <div class="value">12521386952</div>
 
-                <div class="label">AGÊNCIA:</div>
-                <div class="value">40710595</div>
+            <div class="label">AGÊNCIA:</div>
+            <div class="value">40710595</div>
 
-                <div class="label">ISPB Nome:</div>
-                <div class="value">-</div>
+            <div class="label">ISPB Nome:</div>
+            <div class="value">-</div>
 
-                <div class="label">CONTA:</div>
-                <div class="value">Conta Corrente</div>
+            <div class="label">CONTA:</div>
+            <div class="value">Conta Corrente</div>
 
-                <div class="line"></div>
+            <div class="line"></div>
 
-                <div class="label">Identificador:</div>
-                <div class="id" id="idDisplay">E31841474202604121711B84FCTIKD31</div>
-            </div>
-            
-            <!-- Home Indicator -->
-            <div class="home-bar"></div>
+            <div class="label">Identificador:</div>
+            <div class="id" id="idDisplay">E31841474202604121711B84FCTIKD31</div>
         </div>
     </div>
 </div>
@@ -582,11 +495,14 @@ body.dark-mode .home-bar {
     // ==================== Bateria com low battery visual ====================
     function updateBattery(percent) {
         let p = Math.min(100, Math.max(0, percent));
-        batteryLevelFill.style.width = p + "%";
+        let maxFillWidth = 22;
+        let fillWidth = (p / 100) * maxFillWidth;
+        batteryLevelFill.style.width = Math.max(2, fillWidth) + "px";
+        
         const isDark = document.body.classList.contains('dark-mode');
         
         if (p <= 20) {
-            batteryLevelFill.style.background = "#e34d4d";
+            batteryLevelFill.style.background = "#ff3b30";
             batteryWidget.classList.add('battery-low');
         } else {
             batteryWidget.classList.remove('battery-low');
@@ -605,7 +521,7 @@ body.dark-mode .home-bar {
             let p = parseInt(batteryPercentInput.value);
             if (isNaN(p)) p = 87;
             if (p <= 20) {
-                batteryLevelFill.style.background = "#e34d4d";
+                batteryLevelFill.style.background = "#ff3b30";
             } else {
                 batteryLevelFill.style.background = "#ffffff";
             }
@@ -614,7 +530,7 @@ body.dark-mode .home-bar {
             let p = parseInt(batteryPercentInput.value);
             if (isNaN(p)) p = 87;
             if (p <= 20) {
-                batteryLevelFill.style.background = "#e34d4d";
+                batteryLevelFill.style.background = "#ff3b30";
             } else {
                 batteryLevelFill.style.background = "#1c1c1e";
             }
@@ -672,7 +588,7 @@ body.dark-mode .home-bar {
         applyTheme(theme);
     }
 
-    // ==================== Captura ultra HD (4K) - COM MOLDURA ====================
+    // ==================== Captura ultra HD (4K) ====================
     async function captureUltraHD() {
         const target = document.getElementById('captureArea');
         if (!target) return;
@@ -687,14 +603,14 @@ body.dark-mode .home-bar {
             
             const canvas = await html2canvas(target, {
                 scale: 4,
-                backgroundColor: null,
+                backgroundColor: document.body.classList.contains('dark-mode') ? '#000000' : '#ffffff',
                 logging: false,
                 useCORS: true,
                 allowTaint: false
             });
             
             const link = document.createElement('a');
-            link.download = 'iphone16_promax_bank.png';
+            link.download = 'iphone16_native_screenshot.png';
             link.href = canvas.toDataURL('image/png', 1.0);
             link.click();
         } catch (err) {
