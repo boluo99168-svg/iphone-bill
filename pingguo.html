@@ -125,14 +125,14 @@ body {
     border: 1px solid #3a3a3c;
 }
 
-/* ===== 灵动岛（宽度130px，其他样式完整） ===== */
+/* ===== 灵动岛（宽度130px，完整硬件开孔） ===== */
 .dynamic-island {
     position: absolute;
     top: 12px;
     left: 50%;
     transform: translateX(-50%);
     
-    width: 130px;          /* 用户要求从126px改为130px */
+    width: 130px;
     height: 30px;
     
     background: rgba(0, 0, 0, 0.92);
@@ -219,36 +219,33 @@ body {
     overflow-y: visible;
 }
 
-/* ----- 状态栏（绝对定位布局，符合用户最新要求）----- */
+/* ===== 状态栏整体（新样式） ===== */
 .top-bar {
     position: relative;
     height: 44px;
-    padding: 16px 22px 0 22px;   /* 上16 左右22 下0 */
-    background: transparent;
+    padding: 14px 24px 0 24px;  /* 更自然留白 */
     z-index: 60;
 }
 
-/* 左侧时间 */
+/* 时间 */
 .time-text {
     position: absolute;
-    left: 22px;
-    top: 16px;
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: -0.3px;
+    left: 24px;
+    top: 14px;
+    font-weight: 500;
+    font-size: 15px;            /* 更像真机 */
+    letter-spacing: -0.2px;
     color: #111;
-    z-index: 2;
 }
 
-/* 右侧图标组 */
+/* 右侧整体 */
 .right-icons {
     position: absolute;
-    right: 22px;
-    top: 16px;
+    right: 24px;
+    top: 14px;
     display: flex;
     align-items: center;
-    gap: 6px;          /* 用户要求加大间隙至6px */
-    margin-right: 0;
+    gap: 7px;                   /* 拉开空间 */
 }
 
 /* 信号条 */
@@ -256,55 +253,42 @@ body {
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    margin-right: 0;
 }
 .signal span {
-    width: 3px;               /* 用户要求宽度3px */
+    width: 2.5px;
     background: #1c1c1e;
-    display: block;
-    border-radius: 0.8px;     /* 圆角0.8px */
+    border-radius: 1px;
 }
-.signal span:nth-child(1) { height: 5px; }
-.signal span:nth-child(2) { height: 8px; }
-.signal span:nth-child(3) { height: 11px; }
-.signal span:nth-child(4) { height: 14px; }
+.signal span:nth-child(1) { height: 4px; opacity: .6; }
+.signal span:nth-child(2) { height: 7px; opacity: .75; }
+.signal span:nth-child(3) { height: 10px; }
+.signal span:nth-child(4) { height: 13px; }
 
+/* 网络标识（固定5G） */
 .fiveg {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: -0.2px;
+    font-size: 12px;
+    font-weight: 500;           /* 不要太粗 */
     color: #1c1c1e;
-    transform: translateY(-1px);   /* 垂直微调 */
+    margin-left: 1px;
 }
 
-/* 电池区域 */
+/* 电池容器（只保留图标） */
 .battery-svg-container {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-left: 0;
-}
-.battery-svg {
-    width: 22px;    /* 用户要求宽度22px */
-    height: 11px;   /* 高度11px */
     display: flex;
     align-items: center;
+    margin-left: 2px;
+}
+.battery-svg {
+    width: 24px;
+    height: 12px;
 }
 .battery-svg svg {
     width: 100%;
     height: 100%;
     display: block;
 }
-.battery-percent {
-    font-size: 12px;
-    font-weight: 590;
-    color: #1c1c1e;
-    line-height: 1;
-}
-.battery-low .battery-percent {
-    color: #ff3b30;
-}
 
+/* 地址栏 */
 .safari-url {
     background: #e9ecef;
     margin: 8px 18px 0 18px;
@@ -396,8 +380,8 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             <input type="text" id="idInput" placeholder="Identificador" value="E31841474202604121711B84FCTIKD31">
         </div>
         <div class="input-field">
-            <label>📱 Horário status</label>
-            <input type="text" id="statusTimeInput" placeholder="14:11" value="14:11">
+            <label>📱 Horário status (dinâmico)</label>
+            <input type="text" id="statusTimeInput" placeholder="Ignorado" value="--:--" disabled style="background:#eef2f8; color:#888;">
         </div>
         <div class="input-field">
             <label>🔋 Bateria (%)</label>
@@ -407,7 +391,7 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             <button class="btn" id="updateBtn">✨ Atualizar comprovante</button>
             <button class="btn btn-outline" id="screenshotBtn">📸 Baixar screenshot</button>
         </div>
-        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Dynamic Island 130px | Status Bar absolute layout</div>
+        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Dynamic Island 130px | Status Bar ajustada | Sem percentual de bateria</div>
     </div>
 
     <div class="phone-container" id="captureArea">
@@ -419,9 +403,9 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             <div class="dynamic-island"></div>
             <div class="phone-screen">
                 <div class="screen-inner">
-                    <!-- 状态栏：绝对定位布局 -->
+                    <!-- 状态栏（无电池百分比） -->
                     <div class="top-bar">
-                        <span class="time-text" id="phoneTime">14:11</span>
+                        <span class="time-text" id="phoneTime">--:--</span>
                         <div class="right-icons">
                             <div class="signal">
                                 <span></span><span></span><span></span><span></span>
@@ -429,7 +413,7 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
                             <span class="fiveg">5G</span>
                             <div class="battery-svg-container" id="batteryWidget">
                                 <div class="battery-svg" id="batterySvg"></div>
-                                <span class="battery-percent" id="batteryPercentText">87%</span>
+                                <!-- 电池百分比已删除 -->
                             </div>
                         </div>
                     </div>
@@ -513,11 +497,11 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
 </div>
 
 <script>
-    // 生成 Apple 风格电池 SVG（适配 22x11 尺寸）
+    // ========== 电池 SVG 生成（无百分比显示） ==========
     function getBatterySVG(percent, isLow) {
         const fillPercent = Math.min(100, Math.max(0, percent));
-        const shellWidth = 22;
-        const shellHeight = 11;
+        const shellWidth = 24;
+        const shellHeight = 12;
         const fillWidth = (fillPercent / 100) * (shellWidth - 5);
         const fillX = 2;
         const fillY = 1.5;
@@ -526,9 +510,9 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         const strokeColor = isLow ? "#ff453a" : "#3a3a3c";
         const fillColor = isLow ? "#ff453a" : "#1c1c1e";
         
-        return `<svg width="22" height="11" viewBox="0 0 22 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="0.6" y="0.6" width="19.6" height="9.8" rx="2.4" stroke="${strokeColor}" stroke-width="0.8" fill="none"/>
-            <rect x="20.6" y="3.2" width="1.2" height="4.6" rx="0.5" fill="${strokeColor}"/>
+        return `<svg width="24" height="12" viewBox="0 0 24 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0.6" y="0.6" width="21.6" height="10.8" rx="2.6" stroke="${strokeColor}" stroke-width="0.9" fill="none"/>
+            <rect x="22.8" y="3.5" width="1.2" height="5" rx="0.5" fill="${strokeColor}"/>
             <rect x="${fillX}" y="${fillY}" width="${Math.max(1, fillWidth)}" height="${fillHeight}" rx="1" fill="${fillColor}"/>
         </svg>`;
     }
@@ -538,18 +522,54 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         const isLow = p <= 20;
         const svgString = getBatterySVG(p, isLow);
         document.getElementById('batterySvg').innerHTML = svgString;
-        document.getElementById('batteryPercentText').innerText = p + "%";
-        const widget = document.getElementById('batteryWidget');
-        if (isLow) widget.classList.add('battery-low');
-        else widget.classList.remove('battery-low');
+        // 电池百分比文字已删除，不再更新
     }
 
+    // ========== 动态真实时间 ==========
+    const phoneTimeSpan = document.getElementById('phoneTime');
+    function updateTimeReal() {
+        const now = new Date();
+        let h = now.getHours();
+        let m = now.getMinutes();
+        h = h < 10 ? "0" + h : h;
+        m = m < 10 ? "0" + m : m;
+        phoneTimeSpan.innerText = `${h}:${m}`;
+    }
+    setInterval(updateTimeReal, 1000 + Math.random()*2000);
+    updateTimeReal();
+
+    // ========== 信号强度（固定3~4格随机） ==========
+    function updateSignalReal() {
+        const bars = document.querySelectorAll('.signal span');
+        let level = 3 + Math.round(Math.random()); // 3 或 4 格
+        bars.forEach((bar, i) => {
+            bar.style.opacity = i < level ? "1" : "0.3";
+        });
+    }
+    setInterval(updateSignalReal, 4000);
+    updateSignalReal();
+
+    // ========== 网络固定为5G（不随机） ==========
+    // 已经直接写在HTML中，无需动态修改
+
+    // ========== 动态电池消耗（真实下降） ==========
+    const batteryInput = document.getElementById('batteryInput');
+    function updateBatteryReal() {
+        let val = parseInt(batteryInput.value);
+        if (isNaN(val)) return;
+        if (Math.random() < 0.7) return;
+        val -= Math.random() < 0.6 ? 1 : 0;
+        val = Math.max(3, val);
+        batteryInput.value = val;
+        updateBatteryUI(val);
+    }
+    setInterval(updateBatteryReal, 6000);
+
+    // ========== 以下为原有控制面板逻辑 ==========
     const amountInput = document.getElementById('amountInput');
     const timeInput = document.getElementById('timeInput');
     const favorecidoInput = document.getElementById('favorecidoInput');
     const idInput = document.getElementById('idInput');
-    const statusTimeInput = document.getElementById('statusTimeInput');
-    const batteryInput = document.getElementById('batteryInput');
     const updateBtn = document.getElementById('updateBtn');
     const screenshotBtn = document.getElementById('screenshotBtn');
 
@@ -557,7 +577,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
     const timeDisplay = document.getElementById('timeDisplay');
     const favorecidoDisplay = document.getElementById('favorecidoDisplay');
     const idDisplay = document.getElementById('idDisplay');
-    const phoneTimeSpan = document.getElementById('phoneTime');
 
     function formatCurrencyBRL(value) {
         let raw = value.trim();
@@ -574,43 +593,28 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
 
     function refreshAllData() {
         amountDisplay.innerText = formatCurrencyBRL(amountInput.value);
-        
         let timeVal = timeInput.value.trim();
         if (timeVal === "") timeVal = "12/04/2026 14:11:39";
         timeDisplay.innerText = timeVal;
-        
         let favorecidoVal = favorecidoInput.value.trim();
         if (favorecidoVal === "") favorecidoVal = "GABRIEL HIDEKI SUYAMA";
         favorecidoDisplay.innerText = favorecidoVal;
-        
         let idVal = idInput.value.trim();
         if (idVal === "") idVal = "E31841474202604121711B84FCTIKD31";
         idVal = idVal.replace(/[\n\r\t]/g, '');
         idDisplay.innerText = idVal;
         if (idInput.value !== idVal) idInput.value = idVal;
-        
-        let phoneTimeVal = statusTimeInput.value.trim();
-        if (phoneTimeVal === "") phoneTimeVal = "14:11";
-        phoneTimeSpan.innerText = phoneTimeVal;
-        
-        let batteryVal = parseInt(batteryInput.value);
-        if (isNaN(batteryVal)) batteryVal = 87;
-        batteryVal = Math.min(100, Math.max(0, batteryVal));
-        updateBatteryUI(batteryVal);
     }
 
     async function captureScreenshot() {
         const target = document.getElementById('captureArea');
         if (!target) return;
-        
         const originalText = screenshotBtn.innerText;
         screenshotBtn.innerText = '📸 Gerando...';
         screenshotBtn.disabled = true;
-        
         try {
             refreshAllData();
             await new Promise(r => setTimeout(r, 80));
-            
             const canvas = await html2canvas(target, {
                 scale: 3.5,
                 backgroundColor: null,
@@ -618,7 +622,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
                 logging: false,
                 allowTaint: false,
             });
-            
             const link = document.createElement('a');
             link.download = 'comprovante_iphone_16.png';
             link.href = canvas.toDataURL('image/png');
@@ -635,7 +638,7 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
     updateBtn.addEventListener('click', refreshAllData);
     screenshotBtn.addEventListener('click', captureScreenshot);
     
-    const allInputs = [amountInput, timeInput, favorecidoInput, idInput, statusTimeInput, batteryInput];
+    const allInputs = [amountInput, timeInput, favorecidoInput, idInput];
     allInputs.forEach(inp => {
         inp.addEventListener('input', refreshAllData);
         inp.addEventListener('change', refreshAllData);
@@ -650,6 +653,7 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
     });
     
     refreshAllData();
+    updateBatteryUI(parseInt(batteryInput.value));
 </script>
 </body>
 </html>
