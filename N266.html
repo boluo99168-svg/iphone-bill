@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N26 UI — Final</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#111;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  display:flex;
+  justify-content:center;
+  padding:40px;
+}
+
+/* 主容器 */
+#capture{
+  width:390px;
+  background:#111;
+  color:#fff;
+}
+
+/* 状态栏 */
+.status{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 18px 4px 20px;
+  font-size:14px;
+  font-weight:500;
+}
+
+/* 返回 */
+.back{
+  display:flex;
+  align-items:center;
+  padding:6px 16px;
+  font-size:15px;
+}
+
+.back-arrow{
+  font-size:16px;
+  margin-right:4px;
+}
+
+/* 标题区 */
+.name{
+  font-size:20px;
+  font-weight:600;
+  padding:0 20px;
+}
+
+.amount{
+  font-size:36px;
+  font-weight:600;
+  color:#30d5c8;
+  padding:0 20px;
+  margin-top:4px;
+}
+
+.date{
+  font-size:13px;
+  color:#8e8e93;
+  padding:0 20px;
+  margin-top:4px;
+}
+
+/* 操作区 */
+.actions{
+  display:flex;
+  justify-content:space-between;
+  padding:16px 24px;
+}
+
+.action{
+  text-align:center;
+  width:30%;
+}
+
+.circle{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto;
+}
+
+.teal{background:#30d5c8;}
+.dark{
+  background:#1c1c1e;
+  border:1px solid rgba(255,255,255,0.08);
+}
+
+.label{
+  font-size:10px;
+  color:#8e8e93;
+  margin-top:6px;
+}
+
+/* section */
+.section{
+  font-size:18px;
+  font-weight:700;
+  padding:0 20px;
+  margin:12px 0 6px;
+}
+
+/* 卡片 */
+.card{
+  margin:0 14px 14px;
+  background:#1c1c1e;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  padding:12px 14px;
+  border-bottom:1px solid #262628;
+  gap:12px;
+}
+
+.row:last-child{border:none;}
+
+.icon{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.gray{background:#2c2c2e;}
+.tealBox{background:#1f3f3c;}
+
+.text small{
+  font-size:11px;
+  color:#8e8e93;
+}
+
+.text div{
+  font-size:14px;
+}
+
+.arrow{
+  margin-left:auto;
+  color:#636366;
+}
+
+.home{
+  height:5px;
+  width:134px;
+  background:rgba(255,255,255,0.25);
+  margin:20px auto;
+  border-radius:3px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="capture">
+
+<div class="status">
+  <span>14:16</span>
+  <span>59%</span>
+</div>
+
+<div class="back">
+  <span class="back-arrow">‹</span> TikTok
+</div>
+
+<div class="name">Esteban Cuerva De La Fuente</div>
+<div class="amount">75,00 €</div>
+<div class="date">Mittwoch, 2. April 2025, 14:16</div>
+
+<!-- 操作 -->
+<div class="actions">
+
+<div class="action">
+<div class="circle teal"></div>
+<div class="label">Geld an einen<br>Space senden</div>
+</div>
+
+<div class="action">
+<div class="circle dark"></div>
+<div class="label">Einkommensverteiler</div>
+</div>
+
+<div class="action">
+<div class="circle dark"></div>
+<div class="label">Zum Support</div>
+</div>
+
+</div>
+
+<!-- Details -->
+<div class="section">Details</div>
+<div class="card">
+
+<div class="row">
+<div class="icon gray"></div>
+<div class="text">
+<small>Kategorie</small>
+<div>Gutschriften</div>
+</div>
+<div class="arrow">›</div>
+</div>
+
+<div class="row">
+<div class="icon tealBox"></div>
+<div class="text">
+<small>Zu</small>
+<div>Hauptkonto</div>
+</div>
+</div>
+
+<div class="row">
+<div class="icon gray"></div>
+<div class="text">
+<small>Transaktionstyp</small>
+<div>Echtzeitüberweisung</div>
+</div>
+</div>
+
+<div class="row">
+<div class="icon gray"></div>
+<div class="text">
+<small>Verwendungszweck</small>
+<div>1</div>
+</div>
+</div>
+
+</div>
+
+<!-- Notizen -->
+<div class="section">Notizen</div>
+<div class="card">
+<div class="row">
+<div class="icon gray"></div>
+<div class="text">Notiz hinzufügen</div>
+<div class="arrow">›</div>
+</div>
+</div>
+
+<div class="section">Tags</div>
+<div style="padding:0 20px;color:#636366;font-size:13px;">Keine Tags</div>
+
+<div class="home"></div>
+
+</div>
+
+</body>
+</html>
