@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>PIX · Comprovante Bancário</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+:root {
+    --primary: #007aff;
+    --bg-screen: #ffffff;
+    --card-bg: #ffffff;
+    --text-primary: #1c1c1e;
+    --text-secondary: #555;
+    --line-color: #dcdcdc;
+    --status-color: #1c1c1e;
+    --battery-border: #1c1c1e;
+    --toolbar-bg: #f8f8fc;
+}
+
+body.dark-mode {
+    --bg-screen: #000000;
+    --card-bg: #0c0c0d;
+    --text-primary: #ffffff;
+    --text-secondary: #aeaeb2;
+    --line-color: #38383a;
+    --status-color: #ffffff;
+    --battery-border: #ffffff;
+    --toolbar-bg: #1c1c1e;
+}
+
+body {
+    background: #e5e5ea;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 30px;
+    transition: background 0.3s ease;
+}
+body.dark-mode {
+    background: #000000;
+}
+
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 36px;
+    max-width: 1100px;
+    width: 100%;
+}
+
+.control-panel {
+    width: 280px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(20px);
+    border-radius: 28px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+    padding: 22px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: background 0.3s;
+}
+body.dark-mode .control-panel {
+    background: rgba(30, 30, 35, 0.96);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+.control-panel h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+.control-panel .sub {
+    font-size: 12px;
+    color: #6c6c70;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--primary);
+    padding-left: 10px;
+}
+.input-field {
+    margin-bottom: 16px;
+}
+.input-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+.control-panel input, .control-panel select {
+    width: 100%;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1px solid #d9d9df;
+    border-radius: 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: monospace;
+    transition: 0.2s;
+}
+body.dark-mode .control-panel input,
+body.dark-mode .control-panel select {
+    background: #1c1c1e;
+    border-color: #3a3a3c;
+    color: #fff;
+}
+.control-panel input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+.btn {
+    border: none;
+    padding: 12px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 15px;
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-outline {
+    background: #2c3e50;
+}
+.btn-outline:hover {
+    background: #1e2f3c;
+}
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.screenshot-area {
+    width: 390px;
+    background: var(--bg-screen);
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: none;
+    transition: background 0.3s;
+}
+
+/* ===== 安卓状态栏 (时间左，信号/电池/WiFi右) ===== */
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px 4px 16px;
+    background: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--status-color);
+}
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.time {
+    font-weight: 500;
+    font-size: 14px;
+}
+/* 巴西热门应用通知图标 */
+.notification-icons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.notification-icons span {
+    font-size: 11px;
+}
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+/* 信号图标 */
+.signal-icon {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+}
+.signal-icon span {
+    width: 3px;
+    background: var(--status-color);
+    display: block;
+    border-radius: 0.5px;
+}
+.signal-icon span:nth-child(1) { height: 4px; }
+.signal-icon span:nth-child(2) { height: 7px; }
+.signal-icon span:nth-child(3) { height: 10px; }
+.signal-icon span:nth-child(4) { height: 12px; }
+/* WiFi图标 */
+.wifi-icon {
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+/* ===== 三星One UI风格电池 (百分比在外，低电量红色，充电绿色) ===== */
+.android-battery {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.battery-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+.battery-outline {
+    width: 24px;
+    height: 12px;
+    border: 1px solid var(--battery-border);
+    border-radius: 3px;
+    background: transparent;
+    position: relative;
+}
+.battery-outline::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 3px;
+    width: 2px;
+    height: 5px;
+    background: var(--battery-border);
+    border-radius: 1px;
+}
+.battery-fill {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    height: 8px;
+    border-radius: 1.5px;
+    transition: width 0.1s ease, background 0.2s;
+}
+.battery-percent {
+    margin-left: 2px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--status-color);
+}
+/* 充电状态 */
+.battery-charging .battery-fill {
+    background: #34c759 !important;
+}
+.battery-charging .battery-percent {
+    color: #34c759;
+}
+.charging-icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    z-index: 2;
+    display: none;
+}
+.battery-charging .charging-icon {
+    display: block;
+}
+.charging-icon svg {
+    width: 100%;
+    height: 100%;
+}
+/* 低电量 */
+.battery-low .battery-fill {
+    background: #e34d4d !important;
+}
+.battery-low .battery-percent {
+    color: #e34d4d;
+}
+
+/* Chrome风格浏览器地址栏 (带安全锁标识) */
+.browser-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--toolbar-bg);
+    border-bottom: 0.5px solid var(--line-color);
+}
+.browser-nav {
+    display: flex;
+    gap: 12px;
+}
+.browser-nav span {
+    font-size: 18px;
+    color: #5f5f5f;
+}
+.url-container {
+    flex: 1;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.url-bar {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 12px;
+    color: #1c1c1e;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+body.dark-mode .url-bar {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+.security-lock {
+    font-size: 11px;
+    flex-shrink: 0;
+}
+.url-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.menu-icon {
+    font-size: 18px;
+    color: #5f5f5f;
+}
+
+/* 凭证卡片 - 完全保持不变 */
+.card {
+    background: var(--card-bg);
+    margin: 8px 16px 16px 16px;
+    padding: 20px 18px;
+    border-radius: 24px;
+    font-size: 13px;
+    box-shadow: none;
+}
+.title {
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.3px;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+.line {
+    height: 1px;
+    background: var(--line-color);
+    opacity: 1;
+    margin: 12px 0;
+}
+.label {
+    font-weight: 700;
+    margin-top: 8px;
+    color: var(--text-primary);
+    font-size: 12px;
+}
+.value {
+    color: var(--text-secondary);
+    margin: 2px 0 8px;
+    line-height: 1.25;
+    transition: all 0.2s ease;
+}
+.status-ok {
+    color: #2e7d32 !important;
+    font-weight: 600;
+}
+body.dark-mode .status-ok {
+    color: #4caf50 !important;
+}
+.id {
+    font-size: 11px;
+    color: var(--text-secondary);
+    word-break: break-all;
+    white-space: normal;
+    font-family: monospace;
+}
+
+/* 底部宣传语 - 完全保持不变 */
+.footer-message {
+    text-align: center;
+    padding: 16px 20px 20px;
+    font-size: 11px;
+    color: #8e8e93;
+    border-top: 0.5px solid var(--line-color);
+    margin-top: 4px;
+    background: var(--bg-screen);
+}
+body.dark-mode .footer-message {
+    color: #6c6c70;
+}
+.footer-message a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.card {
+    animation: fadeSlide 0.35s ease;
+}
+.update-flash {
+    transform: scale(1.02);
+    opacity: 0.7;
+    transition: all 0.15s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="control-panel">
+        <h3>📱 PIX Comprovante</h3>
+        <div class="sub">bestpay.uk · Screenshot nativo</div>
+        
+        <div class="input-field">
+            <label>💰 VALOR (R$)</label>
+            <input type="text" id="amountInput" placeholder="Ex: 200,00" value="200,00">
+        </div>
+        <div class="input-field">
+            <label>⏱️ REALIZADO EM</label>
+            <input type="text" id="timeInput" placeholder="dd/mm/aaaa HH:MM:SS" value="12/04/2026 14:11:39">
+        </div>
+        <div class="input-field">
+            <label>👤 NOME DO FAVORECIDO</label>
+            <input type="text" id="favorecidoInput" placeholder="Nome completo" value="GABRIEL HIDEKI SUYAMA">
+        </div>
+        <div class="input-field">
+            <label>🏦 BANCO</label>
+            <input type="text" id="bancoInput" placeholder="Banco" value="Banco do Brasil">
+        </div>
+        <div class="input-field">
+            <label>🆔 IDENTIFICADOR</label>
+            <input type="text" id="idInput" placeholder="ID automático" value="E31841474202604121711B84FCTIKD31">
+        </div>
+        <div class="input-field">
+            <label>📱 Horário status</label>
+            <input type="text" id="statusTimeInput" placeholder="14:11" value="14:11">
+        </div>
+        <div class="input-field">
+            <label>🔋 Bateria (%)</label>
+            <input type="number" id="batteryPercent" min="0" max="100" value="87">
+        </div>
+        <div class="input-field">
+            <label>⚡ Carregando</label>
+            <select id="chargingSelect">
+                <option value="false">Não</option>
+                <option value="true">Sim</option>
+            </select>
+        </div>
+        <div class="input-field">
+            <label>🎨 Modo</label>
+            <select id="themeSelect">
+                <option value="light">Claro (Light)</option>
+                <option value="dark">Escuro (Dark)</option>
+            </select>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn" id="updateBtn">✨ Atualizar comprovante</button>
+            <button class="btn btn-outline" id="screenshotBtn">📸 Exportar screenshot 4K</button>
+        </div>
+        <div class="sub" style="margin-top: 16px; font-size: 10px;">✔ bestpay.uk | Padrão Apple</div>
+    </div>
+
+    <div id="captureArea" class="screenshot-area">
+        <!-- 安卓状态栏 + 巴西热门通知图标 -->
+        <div class="status-bar">
+            <div class="status-left">
+                <span class="time" id="phoneTime">14:11</span>
+                <div class="notification-icons">
+                    <span>💬</span>  <!-- WhatsApp -->
+                    <span>📷</span>  <!-- Instagram -->
+                    <span>🏦</span>  <!-- Banco do Brasil -->
+                    <span>⚡</span>  <!-- Pix -->
+                </div>
+            </div>
+            <div class="status-right">
+                <div class="signal-icon"><span></span><span></span><span></span><span></span></div>
+                <span class="wifi-icon">📶</span>
+                <div class="android-battery" id="batteryWidget">
+                    <div class="battery-container">
+                        <div class="battery-outline">
+                            <div class="battery-fill" id="batteryLevelFill"></div>
+                            <span class="charging-icon" id="chargingIcon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M13 2L3 14h7l-1 8 10-12h-7z" fill="white"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    <span class="battery-percent" id="batteryPercentText">87%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chrome风格地址栏 - 带安全锁 + 巴西PIX官方地址 -->
+        <div class="browser-bar">
+            <div class="browser-nav"><span>←</span><span>→</span></div>
+            <div class="url-container">
+                <div class="url-bar">
+                    <span class="security-lock">🔒</span>
+                    <span class="url-text" id="urlText" title="https://banco.pix.gov.br/transferencia">banco.pix.gov.br/transferencia</span>
+                </div>
+            </div>
+            <div class="menu-icon">⋮</div>
+        </div>
+
+        <!-- 凭证卡片 - 完整保持不变 -->
+        <div class="card">
+            <div class="title">COMPROVANTE DE TRANSAÇÃO BANCÁRIA</div>
+            <div class="line"></div>
+
+            <div class="label">SITUAÇÃO:</div>
+            <div class="value status-ok">EFETIVADO</div>
+
+            <div class="label">REALIZADO EM:</div>
+            <div class="value" id="timeDisplay">12/04/2026 14:11:39</div>
+
+            <div class="label">VALOR:</div>
+            <div class="value" id="amountDisplay">200,00</div>
+
+            <div class="label">TIPO DE TRANSFERÊNCIA:</div>
+            <div class="value">PIX</div>
+
+            <div class="line"></div>
+
+            <div class="label">NOME DO DEPOSITANTE:</div>
+            <div class="value">-</div>
+
+            <div class="label">CNPJ:</div>
+            <div class="value">6000392</div>
+
+            <div class="label">Banco/Instituição:</div>
+            <div class="value">6000392</div>
+
+            <div class="line"></div>
+
+            <div class="label">NOME DO FAVORECIDO:</div>
+            <div class="value" id="favorecidoDisplay">GABRIEL HIDEKI SUYAMA</div>
+
+            <div class="label">CPF/CNPJ:</div>
+            <div class="value">12521386952</div>
+
+            <div class="label">Pix Para Beneficiário:</div>
+            <div class="value">12521386952</div>
+
+            <div class="label">BANCO:</div>
+            <div class="value" id="bancoDisplay">Banco do Brasil</div>
+
+            <div class="label">AGÊNCIA:</div>
+            <div class="value">40710595</div>
+
+            <div class="label">ISPB Nome:</div>
+            <div class="value">-</div>
+
+            <div class="label">CONTA:</div>
+            <div class="value">Conta Corrente</div>
+
+            <div class="line"></div>
+
+            <div class="label">Identificador:</div>
+            <div class="id" id="idDisplay">E31841474202604121711B84FCTIKD31</div>
+        </div>
+
+        <!-- 底部宣传语 - 保持不变 -->
+        <div class="footer-message">
+            🔒 Transação segura via PIX · bestpay.uk<br>
+            📱 Baixe o app: <a href="#">bestpay.uk/app</a> | Dúvidas? <a href="#">Fale conosco</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const amountInput = document.getElementById('amountInput');
+    const timeInput = document.getElementById('timeInput');
+    const favorecidoInput = document.getElementById('favorecidoInput');
+    const bancoInput = document.getElementById('bancoInput');
+    const idInput = document.getElementById('idInput');
+    const statusTimeInput = document.getElementById('statusTimeInput');
+    const batteryPercentInput = document.getElementById('batteryPercent');
+    const chargingSelect = document.getElementById('chargingSelect');
+    const themeSelect = document.getElementById('themeSelect');
+    const updateBtn = document.getElementById('updateBtn');
+    const screenshotBtn = document.getElementById('screenshotBtn');
+
+    const amountDisplay = document.getElementById('amountDisplay');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const favorecidoDisplay = document.getElementById('favorecidoDisplay');
+    const bancoDisplay = document.getElementById('bancoDisplay');
+    const idDisplay = document.getElementById('idDisplay');
+    const phoneTimeSpan = document.getElementById('phoneTime');
+    const batteryLevelFill = document.getElementById('batteryLevelFill');
+    const batteryWidget = document.getElementById('batteryWidget');
+    const batteryPercentText = document.getElementById('batteryPercentText');
+
+    function generateTransactionID() {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        let id = "E";
+        for (let i = 0; i < 32; i++) id += chars[Math.floor(Math.random() * chars.length)];
+        return id;
+    }
+
+    function getCurrentDateTime() {
+        const now = new Date();
+        return now.toLocaleString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        }).replace(',', '');
+    }
+
+    function animateUpdate(element) {
+        if (!element) return;
+        element.classList.add('update-flash');
+        setTimeout(() => element.classList.remove('update-flash'), 150);
+    }
+
+    function formatCurrencyBRL(value) {
+        let raw = value.trim();
+        if (raw === "") return "0,00";
+        let cleanRaw = raw.replace(/^R\$\s*/, '');
+        let numeric = cleanRaw.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+        let number = parseFloat(numeric);
+        if (isNaN(number)) number = 0;
+        let fixed = number.toFixed(2).replace('.', ',');
+        let parts = fixed.split(',');
+        let integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return `${integerPart},${parts[1]}`;
+    }
+
+    function updateBattery(percent, isCharging) {
+        let p = Math.min(100, Math.max(0, percent));
+        batteryLevelFill.style.width = p + "%";
+        batteryPercentText.innerText = p + "%";
+        
+        if (isCharging) {
+            batteryWidget.classList.add('battery-charging');
+            batteryLevelFill.style.background = "#34c759";
+        } else {
+            batteryWidget.classList.remove('battery-charging');
+            if (p <= 20) {
+                batteryWidget.classList.add('battery-low');
+                batteryLevelFill.style.background = "#e34d4d";
+            } else {
+                batteryWidget.classList.remove('battery-low');
+                const isDark = document.body.classList.contains('dark-mode');
+                batteryLevelFill.style.background = isDark ? "#ffffff" : "#1c1c1e";
+            }
+        }
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        let p = parseInt(batteryPercentInput.value) || 87;
+        let isCharging = chargingSelect.value === 'true';
+        updateBattery(p, isCharging);
+    }
+
+    function refreshAllDataPro() {
+        let amountRaw = amountInput.value;
+        if (amountRaw === "") amountRaw = "0,00";
+        amountDisplay.innerText = formatCurrencyBRL(amountRaw);
+        animateUpdate(amountDisplay);
+        
+        let timeVal = timeInput.value.trim();
+        if (timeVal === "") timeVal = getCurrentDateTime();
+        timeDisplay.innerText = timeVal;
+        animateUpdate(timeDisplay);
+        
+        let favorecidoVal = favorecidoInput.value.trim();
+        if (favorecidoVal === "") favorecidoVal = "GABRIEL HIDEKI SUYAMA";
+        favorecidoDisplay.innerText = favorecidoVal;
+        animateUpdate(favorecidoDisplay);
+        
+        let bancoVal = bancoInput.value.trim();
+        if (bancoVal === "") bancoVal = "Banco do Brasil";
+        bancoDisplay.innerText = bancoVal;
+        animateUpdate(bancoDisplay);
+        
+        let idVal = idInput.value.trim();
+        if (idVal === "") idVal = generateTransactionID();
+        idVal = idVal.replace(/[\n\r\t]/g, '');
+        idDisplay.innerText = idVal;
+        animateUpdate(idDisplay);
+        
+        let phoneTimeVal = statusTimeInput.value.trim();
+        if (phoneTimeVal === "") phoneTimeVal = "14:11";
+        phoneTimeSpan.innerText = phoneTimeVal;
+        animateUpdate(phoneTimeSpan);
+        
+        let batteryVal = parseInt(batteryPercentInput.value) || 87;
+        let isCharging = chargingSelect.value === 'true';
+        updateBattery(batteryVal, isCharging);
+        
+        applyTheme(themeSelect.value);
+    }
+
+    async function captureUltraHD() {
+        const target = document.getElementById('captureArea');
+        if (!target) return;
+        const originalText = screenshotBtn.innerText;
+        screenshotBtn.innerText = '📸 Gerando 4K...';
+        screenshotBtn.disabled = true;
+        try {
+            refreshAllDataPro();
+            await new Promise(r => setTimeout(r, 120));
+            const canvas = await html2canvas(target, {
+                scale: 4,
+                backgroundColor: document.body.classList.contains('dark-mode') ? '#000000' : '#ffffff',
+                logging: false, useCORS: true, allowTaint: false
+            });
+            const link = document.createElement('a');
+            link.download = 'pix_comprovante_android.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
+        } catch (err) {
+            console.error('Erro no screenshot:', err);
+            alert('Falha ao gerar imagem.');
+        } finally {
+            screenshotBtn.innerText = originalText;
+            screenshotBtn.disabled = false;
+        }
+    }
+    
+    updateBtn.addEventListener('click', refreshAllDataPro);
+    screenshotBtn.addEventListener('click', captureUltraHD);
+    themeSelect.addEventListener('change', refreshAllDataPro);
+    chargingSelect.addEventListener('change', refreshAllDataPro);
+    
+    const allInputs = [amountInput, timeInput, favorecidoInput, bancoInput, idInput, statusTimeInput, batteryPercentInput];
+    allInputs.forEach(inp => {
+        inp.addEventListener('input', refreshAllDataPro);
+        inp.addEventListener('change', refreshAllDataPro);
+    });
+    
+    idInput.addEventListener('input', function() {
+        let raw = this.value;
+        if (raw.includes('\n') || raw.includes('\r') || raw.includes('\t')) {
+            this.value = raw.replace(/[\n\r\t]/g, '');
+            refreshAllDataPro();
+        }
+    });
+    
+    refreshAllDataPro();
+</script>
+
+</body>
+</html>
