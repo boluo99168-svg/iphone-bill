@@ -3,552 +3,737 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>iPhone 16 风格账单 | 纯代码相框 · 完美截图</title>
-    <!-- html2canvas 最新稳定版 -->
+    <title>iPhone 16 Pro 账单复刻 | 1:1 截图版</title>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <style>
+        :root {
+            --bg-a: #dbe2eb;
+            --bg-b: #b8c1ce;
+            --panel-bg: rgba(255, 255, 255, 0.94);
+            --panel-line: rgba(255, 255, 255, 0.72);
+            --panel-shadow: 0 28px 52px -18px rgba(20, 33, 53, 0.34);
+            --screen-bg: #f5f7fb;
+            --text: #0f1720;
+            --accent: #0a84ff;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none; /* 避免截图干扰，但不影响输入框 */
+            user-select: none;
         }
 
         body {
-            background: linear-gradient(145deg, #d4d9e2 0%, #bfc6d0 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            padding: 30px 24px;
+            padding: 28px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.86), transparent 28%),
+                radial-gradient(circle at 85% 22%, rgba(255, 255, 255, 0.45), transparent 24%),
+                linear-gradient(145deg, var(--bg-a), var(--bg-b));
+            color: var(--text);
         }
 
         .dashboard {
+            width: 100%;
+            max-width: 1360px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             align-items: flex-start;
-            gap: 36px;
-            max-width: 1350px;
-            width: 100%;
+            gap: 34px;
         }
 
-        /* 左侧控制面板 */
         .editor-card {
-            width: 290px;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(2px);
-            border-radius: 36px;
-            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.3);
+            width: 312px;
             padding: 24px 22px;
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 34px;
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-line);
+            box-shadow: var(--panel-shadow);
+            backdrop-filter: blur(16px);
         }
 
         .editor-card h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1e2b3c, #0f5b7a);
+            font-size: 1.55rem;
+            line-height: 1.1;
+            font-weight: 760;
+            background: linear-gradient(135deg, #102030 0%, #0d6cab 100%);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .editor-card .desc {
             font-size: 12px;
-            color: #4b5c6e;
-            margin-bottom: 24px;
-            border-left: 3px solid #1677ff;
+            color: #4b6076;
+            margin-bottom: 22px;
             padding-left: 10px;
+            border-left: 3px solid var(--accent);
         }
 
         .input-field {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .input-field label {
             display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #1e2f3e;
             margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 640;
+            color: #172a3c;
         }
 
-        .editor-card input {
+        .editor-card input,
+        .editor-card select {
             width: 100%;
+            border: 1.5px solid #dfe7f1;
+            border-radius: 22px;
             padding: 12px 14px;
-            background: #ffffff;
-            border: 1.5px solid #e2edf7;
-            border-radius: 24px;
-            font-size: 14px;
-            transition: 0.2s;
             outline: none;
-            font-family: 'SF Mono', monospace;
+            background: #fff;
+            font-size: 14px;
+            color: #13202d;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+            font-family: "SF Mono", ui-monospace, monospace;
         }
 
-        .editor-card input:focus {
-            border-color: #1677ff;
-            box-shadow: 0 0 0 3px rgba(22, 119, 255, 0.2);
+        .editor-card input:focus,
+        .editor-card select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.16);
+            transform: translateY(-1px);
         }
 
         .button-group {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin-top: 28px;
+            margin-top: 24px;
         }
 
         .btn {
+            appearance: none;
             border: none;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 15px;
-            background: #1677ff;
-            color: white;
+            border-radius: 999px;
+            padding: 12px 16px;
+            color: #fff;
             cursor: pointer;
-            transition: 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-outline {
-            background: #2c3e50;
-        }
-
-        .btn-outline:hover {
-            background: #1e2f3c;
-            transform: translateY(-2px);
+            font-size: 15px;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+            box-shadow: 0 10px 18px rgba(18, 86, 220, 0.26);
+            background: linear-gradient(180deg, #1d8fff 0%, #0a6de7 100%);
         }
 
         .btn:hover {
-            background: #0e5fdf;
             transform: translateY(-2px);
-            box-shadow: 0 10px 18px rgba(22, 119, 255, 0.3);
+            box-shadow: 0 16px 22px rgba(18, 86, 220, 0.34);
         }
 
-        /* ========= 手机外观 - 纯代码实现 iPhone 16 Pro Max 风格相框 ========= */
-        .phone-container {
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: wait;
+            transform: none;
+        }
+
+        .btn-outline {
+            box-shadow: 0 12px 20px rgba(20, 30, 48, 0.16);
+            background: linear-gradient(180deg, #344459 0%, #202d3e 100%);
+        }
+
+        .phone-stage {
             position: relative;
-            width: 400px;
-            flex-shrink: 0;
-            filter: drop-shadow(0 28px 38px -12px rgba(0, 0, 0, 0.5));
+            padding: 12px;
         }
 
-        /* 机身主体 - 模拟 iPhone 16 系列钛金属边框 */
+        .phone-container {
+            width: min(420px, 92vw);
+            position: relative;
+            flex-shrink: 0;
+            filter: drop-shadow(0 28px 36px rgba(0, 0, 0, 0.38));
+        }
+
         .iphone-body {
             position: relative;
             width: 100%;
-            aspect-ratio: 360 / 780;  /* 19.5:9 全面屏比例 */
-            background: #1c1c1e;      /* 深空黑/钛金属边框色 */
-            border-radius: 56px;
-            box-shadow: 0 30px 40px -15px rgba(0, 0, 0, 0.6), inset 0 0 0 3px rgba(255, 255, 255, 0.08);
-            padding: 8px;
-            border: 1px solid #3a3a3c;
+            aspect-ratio: 393 / 852;
+            padding: 7px;
+            border-radius: 64px;
+            background:
+                linear-gradient(160deg, #444851 0%, #1b1c20 26%, #090a0d 52%, #2a2d33 100%);
+            box-shadow:
+                0 34px 44px -24px rgba(0, 0, 0, 0.85),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+                inset 0 0 0 3px rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        /* 屏幕玻璃层 - 无滚动条 */
-        .phone-screen {
-            background: #f8fafc;
-            border-radius: 50px;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;  /* 关键：去掉右侧滑动屏幕设置，无任何滚动条 */
-            position: relative;
-            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
-        }
-
-        /* 动态岛 (iPhone 14/15/16 系列标志) */
         .iphone-body::before {
             content: "";
             position: absolute;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 110px;
-            height: 34px;
-            background: #111;
-            border-radius: 28px;
-            z-index: 20;
-            box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.2);
+            inset: 5px;
+            border-radius: 59px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            pointer-events: none;
         }
 
-        /* 左侧音量键 (上) */
-        .iphone-body .vol-up {
+        .phone-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 58px;
+            background: var(--screen-bg);
+            box-shadow:
+                inset 0 0 0 0.6px rgba(255, 255, 255, 0.3),
+                inset 0 0 0 1.4px rgba(0, 0, 0, 0.22);
+        }
+
+        .phone-screen::after {
+            content: "";
             position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 16%, transparent 84%, rgba(0, 0, 0, 0.06));
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 36px;
+            border-radius: 999px;
+            background:
+                radial-gradient(circle at 32% 46%, rgba(44, 44, 46, 0.92) 0 10%, #000 24%),
+                radial-gradient(circle at 67% 48%, rgba(33, 33, 35, 0.9) 0 8%, #000 22%),
+                linear-gradient(180deg, #18181a 0%, #050505 100%);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, 0.06),
+                0 2px 8px rgba(0, 0, 0, 0.28);
+            z-index: 25;
+        }
+
+        .dynamic-island::after {
+            content: "";
+            position: absolute;
+            top: 8px;
+            right: 22px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(85, 106, 132, 0.45), rgba(8, 8, 9, 0.9) 65%);
+            opacity: 0.7;
+        }
+
+        .action-btn,
+        .vol-up,
+        .vol-down,
+        .power {
+            position: absolute;
+            background: linear-gradient(180deg, #60646d 0%, #22252c 100%);
+            z-index: 18;
+        }
+
+        .action-btn {
             left: -3px;
-            top: 100px;
+            top: 74px;
             width: 4px;
             height: 32px;
-            background: #2a2a2c;
             border-radius: 4px 0 0 4px;
-            z-index: 15;
         }
-        /* 左侧音量键 (下) */
-        .iphone-body .vol-down {
-            position: absolute;
+
+        .vol-up {
             left: -3px;
-            top: 142px;
+            top: 126px;
             width: 4px;
-            height: 32px;
-            background: #2a2a2c;
+            height: 42px;
             border-radius: 4px 0 0 4px;
-            z-index: 15;
         }
-        /* 右侧电源键 */
-        .iphone-body .power {
-            position: absolute;
+
+        .vol-down {
+            left: -3px;
+            top: 178px;
+            width: 4px;
+            height: 42px;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .power {
             right: -3px;
-            top: 120px;
+            top: 148px;
             width: 4px;
-            height: 48px;
-            background: #2a2a2c;
+            height: 66px;
             border-radius: 0 4px 4px 0;
-            z-index: 15;
-        }
-        /* 操作按钮 (iPhone 15 Pro 及以上新增) */
-        .iphone-body .action-btn {
-            position: absolute;
-            left: -3px;
-            top: 60px;
-            width: 4px;
-            height: 28px;
-            background: #2a2a2c;
-            border-radius: 4px 0 0 4px;
-            z-index: 15;
         }
 
         .screen-inner {
-            background: #ffffff;
             min-height: 100%;
-            padding-bottom: 20px;
-            overflow-y: visible;
+            padding-bottom: 22px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
         }
 
-        /* 状态栏 */
         .status-bar {
+            position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px 6px 20px;
+            padding: 20px 18px 8px;
             font-size: 15px;
-            font-weight: 590;
-            background: #ffffff;
-            color: #121212;
-            font-family: monospace;
+            font-weight: 650;
+            color: #020203;
         }
+
         .time-text {
-            font-weight: 600;
+            padding-left: 10px;
+            letter-spacing: -0.2px;
         }
+
         .status-icons {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
+            padding-right: 8px;
         }
+
         .signal {
             display: flex;
             align-items: flex-end;
             gap: 2px;
+            height: 12px;
         }
-        .signal span {
-            width: 3.5px;
-            background: #1c1c1e;
-            display: block;
-            border-radius: 1px;
-        }
-        .signal span:nth-child(1) { height: 4px; }
-        .signal span:nth-child(2) { height: 7px; }
-        .signal span:nth-child(3) { height: 10px; }
-        .signal span:nth-child(4) { height: 12px; }
 
-        /* 纯色电池组件 - 无闪电 */
+        .signal span {
+            width: 3px;
+            display: block;
+            background: #111112;
+            border-radius: 2px;
+        }
+
+        .signal span:nth-child(1) { height: 4px; opacity: 0.55; }
+        .signal span:nth-child(2) { height: 6px; opacity: 0.75; }
+        .signal span:nth-child(3) { height: 9px; }
+        .signal span:nth-child(4) { height: 11px; }
+
+        .network-text {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: -0.1px;
+        }
+
+        /* ===== 真实 iPhone 16 电池图标 (1:1 复刻 - 最终精修版) ===== */
         .apple-battery {
             display: flex;
             align-items: center;
-            margin-left: 4px;
-        }
-        .battery-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-        .battery-shell {
-            width: 24px;
-            height: 12px;
-            border: 1.2px solid #1c1c1e;
-            border-radius: 4px;
-            background: transparent;
-            position: relative;
-        }
-        .battery-fill {
-            height: 100%;
-            background: #2e7d32;
-            border-radius: 2px;
-            width: 80%;
-            transition: width 0.1s ease, background 0.2s;
-        }
-        .battery-shell::after {
-            content: '';
-            position: absolute;
-            right: -3px;
-            top: 3px;
-            width: 2px;
-            height: 5px;
-            background: #1c1c1e;
-            border-radius: 1px;
+            margin-left: 1px;
         }
 
-        /* 低电量模式 (<20%) */
-        .battery-low .battery-shell {
-            border-color: #e34d4d;
+        .battery-shell {
+            position: relative;
+            width: 27px;
+            height: 13px;
+            border: 1px solid rgba(80, 80, 85, 0.88);
+            border-radius: 3.5px;
+            background: rgba(255, 255, 255, 0.02);
+            box-sizing: border-box;
+            overflow: visible;
         }
+
+        /* 正极 - 短小精致 */
+        .battery-shell::after {
+            content: "";
+            position: absolute;
+            top: 4px;
+            right: -2.5px;
+            width: 1.5px;
+            height: 4px;
+            border-radius: 0.5px;
+            background: rgba(80, 80, 85, 0.88);
+        }
+
+        /* 电量条 - 有明显内缩边距 (真实iOS效果) */
+        .battery-fill {
+            position: absolute;
+            top: 1.5px;
+            left: 1.5px;
+            height: 8px;
+            border-radius: 1.5px;
+            background: #1c1c1e;
+            transition: width 0.2s ease, background-color 0.2s ease;
+        }
+
+        .battery-text-mask {
+            position: absolute;
+            top: 1.5px;
+            left: 1.5px;
+            height: 8px;
+            overflow: hidden;
+            border-radius: 1.5px;
+            pointer-events: none;
+        }
+
+        .battery-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -52%);
+            font-size: 7.5px;
+            font-weight: 720;
+            letter-spacing: -0.2px;
+            line-height: 1;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", Helvetica, Arial, sans-serif;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .battery-percent-dark {
+            color: rgba(0, 0, 0, 0.92);
+        }
+
+        .battery-percent-light {
+            color: #ffffff;
+        }
+
+        .charging-icon {
+            position: absolute;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+        }
+
         .battery-low .battery-fill {
-            background: #e34d4d;
+            background: #ff3b30;
+        }
+
+        .battery-low .battery-shell {
+            border-color: #ff3b30;
         }
         .battery-low .battery-shell::after {
-            background: #e34d4d;
+            background: #ff3b30;
         }
 
-        /* Safari 地址栏 */
+        .battery-charging .battery-fill {
+            background: #34c759;
+        }
+
+        .battery-charging .battery-shell {
+            border-color: #34c759;
+        }
+        .battery-charging .battery-shell::after {
+            background: #34c759;
+        }
+
+        .battery-charging .battery-percent-dark,
+        .battery-charging .battery-text-mask {
+            opacity: 0;
+        }
+
+        .battery-charging .charging-icon {
+            display: flex;
+        }
+
         .safari-url {
-            background: #eef2f8;
-            margin: 8px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin: 10px 16px 0;
+            padding: 7px 12px;
             border-radius: 16px;
-            padding: 8px 14px;
-            font-size: 13px;
-            text-align: center;
-            color: #1f2e3a;
-            font-weight: 500;
+            background: rgba(241, 244, 248, 0.96);
+            color: #657487;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.03);
         }
 
-        /* 账单卡片 */
+        .lock-icon {
+            font-size: 10px;
+        }
+
         .bill-card {
-            background: white;
-            margin: 12px 16px 24px 16px;
-            border-radius: 28px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-            padding: 20px 18px;
-            border: 1px solid #f0f2f6;
+            margin: 14px 16px 22px;
+            padding: 22px 18px 18px;
+            border-radius: 30px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+            border: 1px solid #edf1f6;
+            box-shadow:
+                0 14px 28px rgba(15, 23, 42, 0.06),
+                inset 0 1px 0 rgba(255, 255, 255, 0.7);
         }
 
         .logo-unive {
-            width: 110px;
-            height: 32px;
-            background: url('https://uspay.univepay.com/Images/logo2.png') no-repeat center/contain;
+            width: 118px;
+            height: 34px;
             margin-bottom: 18px;
+            background: url('https://uspay.univepay.com/Images/logo2.png') no-repeat center / contain;
+        }
+
+        .title-right,
+        .subheader-right {
+            text-align: right;
         }
 
         .title-right {
-            text-align: right;
-            font-weight: 800;
+            margin: 10px 0 18px;
+            color: #0c2334;
             font-size: 16px;
-            color: #0b2b3b;
-            margin: 10px 0 18px 0;
+            font-weight: 800;
         }
 
         .subheader-right {
-            text-align: right;
-            font-weight: 700;
+            margin: 14px 0 12px;
+            color: #203049;
             font-size: 14px;
-            margin: 14px 0 12px 0;
-            color: #1f2a44;
+            font-weight: 760;
         }
 
         .info-row {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            margin-bottom: 16px;
+            gap: 12px;
+            margin-bottom: 15px;
             font-size: 13px;
-            flex-wrap: nowrap;
-        }
-        .label-txt {
-            font-weight: 600;
-            color: #5b6e8c;
-            flex-shrink: 0;
-        }
-        .value-txt {
-            font-weight: 500;
-            color: #11181c;
-            text-align: right;
-            word-break: keep-all;
-            white-space: nowrap;
-            overflow-x: visible;
         }
 
-        /* ID 单行强制 - 绝无跳行 */
-        .id-single-line {
-            white-space: nowrap;
-            display: inline-block;
-            font-family: 'SF Mono', monospace;
-            font-size: 10px;
-            letter-spacing: 0.2px;
-            max-width: 100%;
-            overflow: visible;
+        .label-txt {
+            flex-shrink: 0;
+            color: #5b6e8c;
+            font-weight: 650;
         }
-        .id-wrapper {
-            display: inline-block;
-            max-width: 65%;
+
+        .value-txt {
+            color: #121b24;
             text-align: right;
+            font-weight: 540;
             white-space: nowrap;
-            overflow: visible;
+        }
+
+        .value-txt#amountDisplay {
+            font-size: 18px;
+            font-weight: 740;
+            letter-spacing: -0.3px;
+        }
+
+        .id-wrapper {
+            max-width: 66%;
+            text-align: right;
+        }
+
+        .id-single-line {
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            font-size: 10px;
+            font-family: "SF Mono", ui-monospace, monospace;
+            letter-spacing: 0.16px;
         }
 
         .divider {
             height: 1px;
-            background: #eef2f8;
             margin: 18px 0;
-        }
-        .footnote {
-            font-size: 9px;
-            text-align: center;
-            color: #94a3b8;
-            margin-top: 16px;
+            background: #edf2f7;
         }
 
-        /* 彻底隐藏所有滚动条 */
+        .footnote {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 9px;
+            color: #94a3b8;
+        }
+
         ::-webkit-scrollbar {
             display: none;
         }
-        body, .phone-screen, .iphone-body, .phone-container {
+
+        body,
+        .phone-screen,
+        .iphone-body,
+        .phone-container {
             scrollbar-width: none;
             -ms-overflow-style: none;
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 18px 14px 24px;
+                align-items: flex-start;
+            }
+
+            .dashboard {
+                gap: 22px;
+            }
+
+            .editor-card,
+            .phone-container {
+                width: min(100%, 420px);
+            }
         }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <div class="editor-card">
-        <h2>📱 账单工坊</h2>
-        <div class="desc">iPhone 16 风格相框 · ID单行 · 红绿电池</div>
+        <h2>账单工坊 Pro</h2>
+        <div class="desc">iPhone 16 Pro 1:1 截图复刻 · 真实电池图标</div>
+
         <div class="input-field">
             <label>💰 Valor (R$)</label>
-            <input type="text" id="amountInput" placeholder="例如: 62,00" value="62,00">
+            <input type="text" id="amountInput" value="62,00">
         </div>
         <div class="input-field">
             <label>⏱️ Tempo de transaccao</label>
-            <input type="text" id="timeInput" placeholder="dd/mm/aaaa HH:MM" value="13/04/2026 01:34">
+            <input type="text" id="timeInput" value="13/04/2026 01:34">
         </div>
         <div class="input-field">
-            <label>🆔 ID da transacção (自定义)</label>
-            <input type="text" id="idInput" placeholder="交易ID" value="E508719212026041304341DIQRSOLGTM">
+            <label>🆔 ID da transacção</label>
+            <input type="text" id="idInput" value="E508719212026041304341DIQRSOLGTM">
         </div>
         <div class="input-field">
             <label>👤 Destino (Nome)</label>
-            <input type="text" id="destinoInput" placeholder="Nome completo" value="Jose Rodrigues Meneses">
+            <input type="text" id="destinoInput" value="Jose Rodrigues Meneses">
         </div>
         <div class="input-field">
-            <label>📱 状态栏时间</label>
-            <input type="text" id="statusTimeInput" placeholder="如 01:34" value="01:34">
+            <label>🕒 状态栏时间</label>
+            <input type="text" id="statusTimeInput" value="01:34">
         </div>
         <div class="input-field">
-            <label>🔋 电量 (%) ≤20红色 / >20绿色</label>
+            <label>🔋 电量 (%)</label>
             <input type="number" id="batteryInput" min="0" max="100" value="87">
         </div>
-        <div class="button-group">
-            <button class="btn" id="updateBtn">✨ 刷新账单</button>
-            <button class="btn btn-outline" id="screenshotBtn">📸 下载完美截图</button>
+        <div class="input-field">
+            <label>⚡ 充电模式</label>
+            <select id="chargingSelect">
+                <option value="false">未充电</option>
+                <option value="true">充电中</option>
+            </select>
         </div>
-        <div class="desc" style="margin-top: 18px; font-size: 10px;">✔ 纯代码iPhone 16相框 | 无滑动条<br>✔ ID强制一行不跳行 | 电量红绿切换</div>
+
+        <div class="button-group">
+            <button class="btn" id="updateBtn">刷新账单</button>
+            <button class="btn btn-outline" id="screenshotBtn">下载截图</button>
+        </div>
     </div>
 
-    <!-- 手机截图核心区 - 纯CSS相框，无任何外部图片 -->
-    <div class="phone-container" id="captureArea">
-        <div class="iphone-body">
-            <!-- 物理按键装饰 -->
-            <div class="action-btn"></div>
-            <div class="vol-up"></div>
-            <div class="vol-down"></div>
-            <div class="power"></div>
-            <div class="phone-screen">
-                <div class="screen-inner">
-                    <!-- 状态栏区域 -->
-                    <div class="status-bar">
-                        <span class="time-text" id="phoneTime">01:34</span>
-                        <div class="status-icons">
-                            <div class="signal">
-                                <span></span><span></span><span></span><span></span>
-                            </div>
-                            <span style="font-size:12px;">5G</span>
-                            <div class="apple-battery" id="appleBatteryWidget">
-                                <div class="battery-wrapper">
+    <div class="phone-stage">
+        <div class="phone-container" id="captureArea">
+            <div class="iphone-body">
+                <div class="action-btn"></div>
+                <div class="vol-up"></div>
+                <div class="vol-down"></div>
+                <div class="power"></div>
+
+                <div class="phone-screen">
+                    <div class="dynamic-island" aria-hidden="true"></div>
+
+                    <div class="screen-inner">
+                        <div class="status-bar">
+                            <span class="time-text" id="phoneTime">01:34</span>
+
+                            <div class="status-icons">
+                                <div class="signal"><span></span><span></span><span></span><span></span></div>
+                                <span class="network-text">5G</span>
+                                <div class="apple-battery" id="appleBatteryWidget">
                                     <div class="battery-shell">
-                                        <div class="battery-fill" id="batteryLevelFill" style="width:87%; background:#2e7d32;"></div>
+                                        <div class="battery-fill" id="batteryLevelFill"></div>
+                                        <span class="battery-percent battery-percent-dark" id="batteryPercentDark">87</span>
+                                        <div class="battery-text-mask" id="batteryTextMask">
+                                            <span class="battery-percent battery-percent-light" id="batteryPercentLight">87</span>
+                                        </div>
+                                        <span class="charging-icon" id="chargingIcon">⚡</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- Safari 栏 -->
-                    <div class="safari-url">uspay.univepay.com 🔒 PIX</div>
-                    
-                    <div class="bill-card">
-                        <div class="logo-unive" id="logoBrand"></div>
-                        <div class="title-right">comprovante de transacção</div>
-                        
-                        <div class="info-row">
-                            <span class="label-txt">Valor</span>
-                            <span class="value-txt" id="amountDisplay">R$ 62,00</span>
+
+                        <div class="safari-url">
+                            <span class="lock-icon">🔒</span>
+                            banco.pix.gov.br
                         </div>
-                        <div class="info-row">
-                            <span class="label-txt">Tempo de transaccao</span>
-                            <span class="value-txt" id="timeDisplay">13/04/2026 01:34</span>
-                        </div>
-                        <!-- ID行：强制单行，完美一行显示 -->
-                        <div class="info-row">
-                            <span class="label-txt">ID da transacção</span>
-                            <div class="id-wrapper">
-                                <span class="value-txt id-single-line" id="idDisplay">E508719212026041304341DIQRSOLGTM</span>
+
+                        <div class="bill-card">
+                            <div class="logo-unive" id="logoBrand"></div>
+                            <div class="title-right">comprovante de transacção</div>
+
+                            <div class="info-row">
+                                <span class="label-txt">Valor</span>
+                                <span class="value-txt" id="amountDisplay">R$ 62,00</span>
                             </div>
+                            <div class="info-row">
+                                <span class="label-txt">Tempo de transaccao</span>
+                                <span class="value-txt" id="timeDisplay">13/04/2026 01:34</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">ID da transacção</span>
+                                <div class="id-wrapper">
+                                    <span class="value-txt id-single-line" id="idDisplay">E508719212026041304341DIQRSOLGTM</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">Tipo de transferência</span>
+                                <span class="value-txt">PIX</span>
+                            </div>
+
+                            <div class="divider"></div>
+                            <div class="subheader-right">Informações do depositante</div>
+                            <div class="info-row">
+                                <span class="label-txt">Nome</span>
+                                <span class="value-txt">Univebet Gaming Ltda</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">CNPJ</span>
+                                <span class="value-txt">64663535000125</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">Banco/Instituição</span>
+                                <span class="value-txt">50871921</span>
+                            </div>
+
+                            <div class="divider"></div>
+                            <div class="subheader-right">Informações do destino</div>
+                            <div class="info-row">
+                                <span class="label-txt">Nome</span>
+                                <span class="value-txt" id="destinoDisplay">Jose Rodrigues Meneses</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">CPF/CNPJ</span>
+                                <span class="value-txt">17649476812</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">AGÊNCIA</span>
+                                <span class="value-txt">10573521</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">ISPB Nome:</span>
+                                <span class="value-txt">MERCADO PAGO IP LTDA.</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">Chave</span>
+                                <span class="value-txt">+5511981760984</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="label-txt">Tipo de Conta</span>
+                                <span class="value-txt">PHONE</span>
+                            </div>
+                            <div class="divider"></div>
+                            <div class="footnote">Transação verificada · PIX instantâneo</div>
                         </div>
-                        <div class="info-row">
-                            <span class="label-txt">Tipo de transferência</span>
-                            <span class="value-txt">PIX</span>
-                        </div>
-                        
-                        <div class="divider"></div>
-                        <div class="subheader-right">Informações do depositante</div>
-                        <div class="info-row">
-                            <span class="label-txt">Nome</span>
-                            <span class="value-txt">Univebet Gaming Ltda</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">CNPJ</span>
-                            <span class="value-txt">64663535000125</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">Banco/Instituição</span>
-                            <span class="value-txt">50871921</span>
-                        </div>
-                        
-                        <div class="divider"></div>
-                        <div class="subheader-right">Informações do destino</div>
-                        <div class="info-row">
-                            <span class="label-txt">Nome</span>
-                            <span class="value-txt" id="destinoDisplay">Jose Rodrigues Meneses</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">CPF/CNPJ</span>
-                            <span class="value-txt">17649476812</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">AGÊNCIA</span>
-                            <span class="value-txt">10573521</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">ISPB Nome:</span>
-                            <span class="value-txt">MERCADO PAGO IP LTDA.</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">Chave</span>
-                            <span class="value-txt">+5511981760984</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label-txt">Tipo de Conta</span>
-                            <span class="value-txt">PHONE</span>
-                        </div>
-                        <div class="divider"></div>
-                        <div class="footnote">Transação verificada · PIX instantâneo</div>
                     </div>
                 </div>
             </div>
@@ -557,13 +742,13 @@
 </div>
 
 <script>
-    // DOM 元素绑定
     const amountInput = document.getElementById('amountInput');
     const timeInput = document.getElementById('timeInput');
     const idInput = document.getElementById('idInput');
     const destinoInput = document.getElementById('destinoInput');
     const statusTimeInput = document.getElementById('statusTimeInput');
     const batteryInput = document.getElementById('batteryInput');
+    const chargingSelect = document.getElementById('chargingSelect');
     const updateBtn = document.getElementById('updateBtn');
     const screenshotBtn = document.getElementById('screenshotBtn');
 
@@ -574,159 +759,154 @@
     const phoneTimeSpan = document.getElementById('phoneTime');
     const batteryFillElement = document.getElementById('batteryLevelFill');
     const batteryWidget = document.getElementById('appleBatteryWidget');
+    const batteryPercentDark = document.getElementById('batteryPercentDark');
+    const batteryPercentLight = document.getElementById('batteryPercentLight');
+    const batteryTextMask = document.getElementById('batteryTextMask');
 
-    // 巴西货币格式化
     function formatCurrencyBRL(value) {
         let raw = value.trim();
         if (raw === "") return "R$ 0,00";
-        let numeric = raw.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+
+        let numeric = raw.replace(/\./g, "").replace(",", ".").replace(/[^\d.-]/g, "");
         let number = parseFloat(numeric);
         if (isNaN(number)) number = 0;
-        let fixed = number.toFixed(2).replace('.', ',');
-        let parts = fixed.split(',');
-        let integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        const fixed = number.toFixed(2).replace(".", ",");
+        const parts = fixed.split(",");
+        const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         return `R$ ${integerPart},${parts[1]}`;
     }
 
-    // 电池更新：≤20%红色，＞20%绿色
-    function updateBatteryUI(percent) {
-        let p = Math.min(100, Math.max(0, percent));
-        batteryFillElement.style.width = p + "%";
-        
-        if (p <= 20) {
-            batteryFillElement.style.background = "#e34d4d";
-            batteryWidget.classList.add('battery-low');
-        } else {
-            batteryFillElement.style.background = "#2e7d32";
-            batteryWidget.classList.remove('battery-low');
+    function updateBatteryUI(percent, isCharging = false) {
+        const clamped = Math.min(100, Math.max(0, Number(percent) || 0));
+        // 电池内部可用宽度约24px (27px总宽 - 左右各1.5px内边距)
+        const maxFillWidth = 24;
+        const minVisible = clamped === 0 ? 1 : 2.5;
+        const fillWidth = Math.min(maxFillWidth, Math.max(minVisible, (clamped / 100) * maxFillWidth));
+
+        batteryFillElement.style.width = `${fillWidth}px`;
+        batteryTextMask.style.width = `${fillWidth}px`;
+        batteryPercentDark.textContent = `${clamped}`;
+        batteryPercentLight.textContent = `${clamped}`;
+        batteryWidget.classList.remove("battery-low", "battery-charging");
+
+        if (isCharging) {
+            batteryWidget.classList.add("battery-charging");
+        } else if (clamped <= 20) {
+            batteryWidget.classList.add("battery-low");
         }
     }
 
-    // 全局刷新UI，ID强制单行无换行
     function refreshAllData() {
-        // 金额
-        let amountRaw = amountInput.value;
-        if (amountRaw === "") amountRaw = "0,00";
+        const amountRaw = amountInput.value.trim() || "0,00";
         amountDisplay.innerText = formatCurrencyBRL(amountRaw);
-        
-        // 交易时间
-        let timeVal = timeInput.value.trim();
-        if (timeVal === "") timeVal = "13/04/2026 01:34";
+
+        const timeVal = timeInput.value.trim() || "13/04/2026 01:34";
         timeDisplay.innerText = timeVal;
-        
-        // ID 强制单行：移除换行符、回车符
-        let idVal = idInput.value.trim();
-        if (idVal === "") idVal = "E508719212026041304341DIQRSOLGTM";
-        idVal = idVal.replace(/[\n\r\t]/g, '');
+
+        let idVal = idInput.value.trim() || "E508719212026041304341DIQRSOLGTM";
+        idVal = idVal.replace(/[\n\r\t]/g, "");
         idDisplay.innerText = idVal;
         if (idInput.value !== idVal) idInput.value = idVal;
-        
-        // 收款人姓名
-        let destVal = destinoInput.value.trim();
-        if (destVal === "") destVal = "Jose Rodrigues Meneses";
+
+        const destVal = destinoInput.value.trim() || "Jose Rodrigues Meneses";
         destinoDisplay.innerText = destVal;
-        
-        // 状态栏时间
-        let phoneTimeVal = statusTimeInput.value.trim();
-        if (phoneTimeVal === "") phoneTimeVal = "01:34";
+
+        const phoneTimeVal = statusTimeInput.value.trim() || "01:34";
         phoneTimeSpan.innerText = phoneTimeVal;
-        
-        // 电量处理
-        let batteryVal = parseInt(batteryInput.value);
+
+        let batteryVal = parseInt(batteryInput.value, 10);
         if (isNaN(batteryVal)) batteryVal = 87;
         batteryVal = Math.min(100, Math.max(0, batteryVal));
-        updateBatteryUI(batteryVal);
+        batteryInput.value = batteryVal;
+
+        const isCharging = chargingSelect.value === "true";
+        updateBatteryUI(batteryVal, isCharging);
     }
 
-    // 截图功能 (完美捕获所有样式，无滚动条)
     async function captureScreenshot() {
-        const target = document.getElementById('captureArea');
+        const target = document.getElementById("captureArea");
         if (!target) return;
-        
+
         const originalText = screenshotBtn.innerText;
-        screenshotBtn.innerText = '📸 生成截图中...';
+        screenshotBtn.innerText = "生成中...";
         screenshotBtn.disabled = true;
-        
+
         try {
             refreshAllData();
-            await new Promise(r => setTimeout(r, 80));
-            
+            await new Promise((resolve) => setTimeout(resolve, 90));
+
             const canvas = await html2canvas(target, {
-                scale: 2.8,
+                scale: 3,
                 backgroundColor: null,
                 useCORS: true,
                 logging: false,
                 allowTaint: false,
                 onclone: (clonedDoc) => {
-                    // 修复logo跨域
-                    const clonedLogo = clonedDoc.querySelector('.logo-unive');
+                    const clonedLogo = clonedDoc.querySelector(".logo-unive");
                     if (clonedLogo) {
                         clonedLogo.style.backgroundImage = "url('https://uspay.univepay.com/Images/logo2.png')";
                         clonedLogo.style.backgroundSize = "contain";
                     }
-                    // 确保ID单行样式
-                    const clonedIdSpan = clonedDoc.querySelector('#idDisplay');
+
+                    const clonedIdSpan = clonedDoc.querySelector("#idDisplay");
                     if (clonedIdSpan) {
                         clonedIdSpan.style.whiteSpace = "nowrap";
                         clonedIdSpan.style.display = "inline-block";
                     }
-                    // 电池低电量样式同步
-                    const clonedBatteryWidget = clonedDoc.querySelector('#appleBatteryWidget');
-                    if (clonedBatteryWidget && batteryWidget.classList.contains('battery-low')) {
-                        clonedBatteryWidget.classList.add('battery-low');
+
+                    const clonedBatteryWidget = clonedDoc.querySelector("#appleBatteryWidget");
+                    if (clonedBatteryWidget && batteryWidget.classList.contains("battery-low")) {
+                        clonedBatteryWidget.classList.add("battery-low");
                     }
-                    const clonedFill = clonedDoc.querySelector('#batteryLevelFill');
-                    if (clonedFill) {
-                        clonedFill.style.width = batteryFillElement.style.width;
-                        clonedFill.style.background = batteryFillElement.style.background;
+                    if (clonedBatteryWidget && batteryWidget.classList.contains("battery-charging")) {
+                        clonedBatteryWidget.classList.add("battery-charging");
                     }
-                    // 确保无滚动条
-                    const clonedScreen = clonedDoc.querySelector('.phone-screen');
-                    if (clonedScreen) clonedScreen.style.overflow = "hidden";
+
+                    const clonedFill = clonedDoc.querySelector("#batteryLevelFill");
+                    if (clonedFill) clonedFill.style.width = batteryFillElement.style.width;
+
+                    const clonedTextMask = clonedDoc.querySelector("#batteryTextMask");
+                    if (clonedTextMask) clonedTextMask.style.width = batteryTextMask.style.width;
+
+                    const clonedPercentDark = clonedDoc.querySelector("#batteryPercentDark");
+                    const clonedPercentLight = clonedDoc.querySelector("#batteryPercentLight");
+                    if (clonedPercentDark) clonedPercentDark.textContent = batteryPercentDark.textContent;
+                    if (clonedPercentLight) clonedPercentLight.textContent = batteryPercentLight.textContent;
                 }
             });
-            
-            const link = document.createElement('a');
-            link.download = 'iphone16_bill.png';
-            link.href = canvas.toDataURL('image/png');
+
+            const link = document.createElement("a");
+            link.download = "iphone16pro_bill.png";
+            link.href = canvas.toDataURL("image/png");
             link.click();
         } catch (err) {
-            console.error('截图失败:', err);
-            alert('截图生成失败，请检查网络或重试');
+            console.error("截图失败:", err);
+            alert("截图生成失败，请检查网络或重试");
         } finally {
             screenshotBtn.innerText = originalText;
             screenshotBtn.disabled = false;
         }
     }
-    
-    // 事件绑定
-    updateBtn.addEventListener('click', refreshAllData);
-    screenshotBtn.addEventListener('click', captureScreenshot);
-    
-    const allInputs = [amountInput, timeInput, idInput, destinoInput, statusTimeInput, batteryInput];
-    allInputs.forEach(inp => {
-        inp.addEventListener('input', refreshAllData);
-        inp.addEventListener('change', refreshAllData);
+
+    updateBtn.addEventListener("click", refreshAllData);
+    screenshotBtn.addEventListener("click", captureScreenshot);
+    chargingSelect.addEventListener("change", refreshAllData);
+
+    [amountInput, timeInput, idInput, destinoInput, statusTimeInput, batteryInput].forEach((input) => {
+        input.addEventListener("input", refreshAllData);
+        input.addEventListener("change", refreshAllData);
     });
-    
-    // 初始化
+
+    idInput.addEventListener("input", function () {
+        const raw = this.value;
+        if (/[\n\r\t]/.test(raw)) {
+            this.value = raw.replace(/[\n\r\t]/g, "");
+        }
+        refreshAllData();
+    });
+
     refreshAllData();
-    
-    // ID输入框实时过滤换行符
-    idInput.addEventListener('input', function(e) {
-        let raw = this.value;
-        if (raw.includes('\n') || raw.includes('\r') || raw.includes('\t')) {
-            this.value = raw.replace(/[\n\r\t]/g, '');
-            refreshAllData();
-        }
-    });
-    idInput.addEventListener('blur', function() {
-        let raw = this.value.trim();
-        if (raw.includes('\n') || raw.includes('\r')) {
-            this.value = raw.replace(/[\n\r\t]/g, '');
-            refreshAllData();
-        }
-    });
 </script>
 </body>
 </html>
