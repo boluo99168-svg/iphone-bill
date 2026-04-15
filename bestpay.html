@@ -11,7 +11,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    user-select: none; /* evita seleção durante screenshot */
+    user-select: none;
 }
 
 body{
@@ -24,7 +24,6 @@ body{
     padding: 30px 20px;
 }
 
-/* Layout com dois painéis */
 .dashboard {
     display: flex;
     flex-wrap: wrap;
@@ -35,7 +34,6 @@ body{
     width: 100%;
 }
 
-/* Painel de controle esquerdo */
 .control-panel {
     width: 280px;
     background: rgba(255, 255, 255, 0.96);
@@ -127,7 +125,6 @@ body{
     padding: 8px;
     border: 1px solid #3a3a3c;
 }
-/* 动态岛 */
 .iphone-body::before {
     content: "";
     position: absolute;
@@ -141,13 +138,11 @@ body{
     z-index: 20;
     box-shadow: inset 0 1px 1px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.2);
 }
-/* 物理按键 */
 .iphone-body .vol-up { position: absolute; left: -3px; top: 100px; width: 4px; height: 32px; background: #2a2a2c; border-radius: 4px 0 0 4px; z-index: 15; }
 .iphone-body .vol-down { position: absolute; left: -3px; top: 142px; width: 4px; height: 32px; background: #2a2a2c; border-radius: 4px 0 0 4px; z-index: 15; }
 .iphone-body .power { position: absolute; right: -3px; top: 120px; width: 4px; height: 48px; background: #2a2a2c; border-radius: 0 4px 4px 0; z-index: 15; }
 .iphone-body .action-btn { position: absolute; left: -3px; top: 60px; width: 4px; height: 28px; background: #2a2a2c; border-radius: 4px 0 0 4px; z-index: 15; }
 
-/* 屏幕区域 (fundo cinza realista) */
 .phone-screen {
     background: #efefef;
     border-radius: 50px;
@@ -164,7 +159,6 @@ body{
     overflow-y: visible;
 }
 
-/* 状态栏 */
 .status-bar {
     display: flex;
     justify-content: space-between;
@@ -185,17 +179,90 @@ body{
 .signal span:nth-child(3) { height: 10px; }
 .signal span:nth-child(4) { height: 12px; }
 
-/* Bateria estilo iOS */
-.apple-battery { display: flex; align-items: center; margin-left: 4px; }
-.battery-wrapper { position: relative; display: flex; align-items: center; }
-.battery-shell { width: 24px; height: 12px; border: 1.2px solid #1c1c1e; border-radius: 4px; background: transparent; position: relative; }
-.battery-fill { height: 100%; background: #2e7d32; border-radius: 2px; width: 80%; transition: width 0.1s ease, background 0.2s; }
-.battery-shell::after { content: ''; position: absolute; right: -3px; top: 3px; width: 2px; height: 5px; background: #1c1c1e; border-radius: 1px; }
-.battery-low .battery-shell { border-color: #e34d4d; }
-.battery-low .battery-fill { background: #e34d4d; }
-.battery-low .battery-shell::after { background: #e34d4d; }
+/* ===== 电池图标 - 基于您上一版本微调 ===== */
+.apple-battery { 
+    display: flex; 
+    align-items: center; 
+    margin-left: 4px; 
+}
+.battery-wrapper { 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+}
+.battery-shell { 
+    width: 25px; 
+    height: 12px; 
+    border: 1px solid #8e8e93; 
+    border-radius: 3.5px; 
+    background: transparent; 
+    position: relative; 
+}
+.battery-shell::after { 
+    content: ''; 
+    position: absolute; 
+    right: -2.5px; 
+    top: 3.5px; 
+    width: 1.5px; 
+    height: 4px; 
+    background: #8e8e93; 
+    border-radius: 0.5px; 
+}
+.battery-fill { 
+    position: absolute;
+    left: 1.5px;
+    top: 1.5px;
+    height: 7px;
+    border-radius: 1.5px;
+    background: #1c1c1e;
+    transition: width 0.1s ease, background 0.2s;
+}
+/* 百分比文字 */
+.battery-percent {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 7px;
+    font-weight: 700;
+    color: #fff;
+    pointer-events: none;
+    white-space: nowrap;
+}
+.charging-icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 7px;
+    color: #fff;
+    display: none;
+}
+.battery-charging .charging-icon {
+    display: block;
+}
+.battery-charging .battery-percent {
+    display: none;
+}
+.battery-low .battery-shell { 
+    border-color: #ff3b30; 
+}
+.battery-low .battery-fill { 
+    background: #ff3b30; 
+}
+.battery-low .battery-shell::after { 
+    background: #ff3b30; 
+}
+.battery-charging .battery-fill {
+    background: #34c759;
+}
+.battery-charging .battery-shell {
+    border-color: #34c759;
+}
+.battery-charging .battery-shell::after {
+    background: #34c759;
+}
 
-/* Safari 地址栏 */
 .safari-url {
     background: #eef2f8;
     margin: 8px 16px;
@@ -207,7 +274,6 @@ body{
     font-weight: 500;
 }
 
-/* ===== Cartão do comprovante (estilo banco) ===== */
 .card {
     background: #fff;
     margin: 10px 12px 20px;
@@ -251,14 +317,12 @@ body{
     word-break: break-all;
     white-space: normal;
 }
-/* ID em linha única (opcional, mas seguro) */
 .id-single {
     white-space: nowrap;
     overflow-x: auto;
     font-family: monospace;
 }
 
-/* Remove scrollbars globalmente */
 ::-webkit-scrollbar { display: none; }
 body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms-overflow-style: none; }
 </style>
@@ -266,7 +330,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
 <body>
 
 <div class="dashboard">
-    <!-- Painel de controle -->
     <div class="control-panel">
         <h2>🏦 Comprovante</h2>
         <div class="desc">iPhone 16 · Edição bancária realista</div>
@@ -291,17 +354,23 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
             <input type="text" id="statusTimeInput" placeholder="14:11" value="14:11">
         </div>
         <div class="input-field">
-            <label>🔋 Bateria (%) ≤20 vermelho / >20 verde</label>
+            <label>🔋 Bateria (%)</label>
             <input type="number" id="batteryInput" min="0" max="100" value="87">
+        </div>
+        <div class="input-field">
+            <label>⚡ Carregando</label>
+            <select id="chargingSelect">
+                <option value="false">Normal</option>
+                <option value="true">Carregando</option>
+            </select>
         </div>
         <div class="button-group">
             <button class="btn" id="updateBtn">✨ Atualizar comprovante</button>
             <button class="btn btn-outline" id="screenshotBtn">📸 Baixar screenshot</button>
         </div>
-        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Layout fiel ao banco | ID quebra automática</div>
+        <div class="desc" style="margin-top: 16px; font-size: 10px;">✔ Bateria iOS 16 real | Porcentagem interna | Carregamento com ícone</div>
     </div>
 
-    <!-- iPhone com comprovante -->
     <div class="phone-container" id="captureArea">
         <div class="iphone-body">
             <div class="action-btn"></div>
@@ -318,7 +387,9 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
                             <div class="apple-battery" id="appleBatteryWidget">
                                 <div class="battery-wrapper">
                                     <div class="battery-shell">
-                                        <div class="battery-fill" id="batteryLevelFill" style="width:87%; background:#2e7d32;"></div>
+                                        <div class="battery-fill" id="batteryLevelFill"></div>
+                                        <span class="battery-percent" id="batteryPercent">87</span>
+                                        <span class="charging-icon" id="chargingIcon">⚡</span>
                                     </div>
                                 </div>
                             </div>
@@ -326,7 +397,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
                     </div>
                     <div class="safari-url">🔒 banco.pix.gov.br · Transferência</div>
 
-                    <!-- Comprovante fiel ao estilo solicitado -->
                     <div class="card">
                         <div class="title">COMPROVANTE DE TRANSAÇÃO BANCÁRIA</div>
                         <div class="line"></div>
@@ -404,13 +474,13 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
 </div>
 
 <script>
-    // Elementos do DOM
     const amountInput = document.getElementById('amountInput');
     const timeInput = document.getElementById('timeInput');
     const favorecidoInput = document.getElementById('favorecidoInput');
     const idInput = document.getElementById('idInput');
     const statusTimeInput = document.getElementById('statusTimeInput');
     const batteryInput = document.getElementById('batteryInput');
+    const chargingSelect = document.getElementById('chargingSelect');
     const updateBtn = document.getElementById('updateBtn');
     const screenshotBtn = document.getElementById('screenshotBtn');
 
@@ -421,8 +491,8 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
     const phoneTimeSpan = document.getElementById('phoneTime');
     const batteryFillElement = document.getElementById('batteryLevelFill');
     const batteryWidget = document.getElementById('appleBatteryWidget');
+    const batteryPercentSpan = document.getElementById('batteryPercent');
 
-    // Formatação de valor monetário (apenas número, sem R$)
     function formatCurrencyBRL(value) {
         let raw = value.trim();
         if (raw === "") return "0,00";
@@ -436,56 +506,52 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         return `${integerPart},${parts[1]}`;
     }
 
-    // Atualizar bateria (≤20% vermelho, >20% verde)
-    function updateBatteryUI(percent) {
+    function updateBatteryUI(percent, isCharging) {
         let p = Math.min(100, Math.max(0, percent));
-        batteryFillElement.style.width = p + "%";
-        if (p <= 20) {
-            batteryFillElement.style.background = "#e34d4d";
+        let maxFillWidth = 22;
+        let fillWidth = (p / 100) * maxFillWidth;
+        batteryFillElement.style.width = Math.max(2, fillWidth) + "px";
+        batteryPercentSpan.textContent = p;
+        
+        batteryWidget.classList.remove('battery-low', 'battery-charging');
+        
+        if (isCharging) {
+            batteryWidget.classList.add('battery-charging');
+        } else if (p <= 20) {
             batteryWidget.classList.add('battery-low');
-        } else {
-            batteryFillElement.style.background = "#2e7d32";
-            batteryWidget.classList.remove('battery-low');
         }
     }
 
-    // Atualizar todos os dados dinâmicos
     function refreshAllData() {
-        // Valor
         let amountRaw = amountInput.value;
         if (amountRaw === "") amountRaw = "0,00";
         amountDisplay.innerText = formatCurrencyBRL(amountRaw);
         
-        // Data/hora
         let timeVal = timeInput.value.trim();
         if (timeVal === "") timeVal = "12/04/2026 14:11:39";
         timeDisplay.innerText = timeVal;
         
-        // Nome do favorecido
         let favorecidoVal = favorecidoInput.value.trim();
         if (favorecidoVal === "") favorecidoVal = "GABRIEL HIDEKI SUYAMA";
         favorecidoDisplay.innerText = favorecidoVal;
         
-        // Identificador (ID) - sem quebras de linha
         let idVal = idInput.value.trim();
         if (idVal === "") idVal = "E31841474202604121711B84FCTIKD31";
         idVal = idVal.replace(/[\n\r\t]/g, '');
         idDisplay.innerText = idVal;
         if (idInput.value !== idVal) idInput.value = idVal;
         
-        // Horário da status bar
         let phoneTimeVal = statusTimeInput.value.trim();
         if (phoneTimeVal === "") phoneTimeVal = "14:11";
         phoneTimeSpan.innerText = phoneTimeVal;
         
-        // Bateria
         let batteryVal = parseInt(batteryInput.value);
         if (isNaN(batteryVal)) batteryVal = 87;
         batteryVal = Math.min(100, Math.max(0, batteryVal));
-        updateBatteryUI(batteryVal);
+        let isCharging = chargingSelect.value === 'true';
+        updateBatteryUI(batteryVal, isCharging);
     }
 
-    // Captura de tela (html2canvas)
     async function captureScreenshot() {
         const target = document.getElementById('captureArea');
         if (!target) return;
@@ -511,10 +577,12 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
                     if (clonedBattery && batteryWidget.classList.contains('battery-low')) {
                         clonedBattery.classList.add('battery-low');
                     }
+                    if (clonedBattery && batteryWidget.classList.contains('battery-charging')) {
+                        clonedBattery.classList.add('battery-charging');
+                    }
                     const clonedFill = clonedDoc.querySelector('#batteryLevelFill');
                     if (clonedFill) {
                         clonedFill.style.width = batteryFillElement.style.width;
-                        clonedFill.style.background = batteryFillElement.style.background;
                     }
                 }
             });
@@ -532,9 +600,9 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         }
     }
     
-    // Eventos
     updateBtn.addEventListener('click', refreshAllData);
     screenshotBtn.addEventListener('click', captureScreenshot);
+    chargingSelect.addEventListener('change', refreshAllData);
     
     const allInputs = [amountInput, timeInput, favorecidoInput, idInput, statusTimeInput, batteryInput];
     allInputs.forEach(inp => {
@@ -542,7 +610,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         inp.addEventListener('change', refreshAllData);
     });
     
-    // Prevenir quebras de linha no campo ID
     idInput.addEventListener('input', function() {
         let raw = this.value;
         if (raw.includes('\n') || raw.includes('\r') || raw.includes('\t')) {
@@ -551,7 +618,6 @@ body, .phone-screen, .iphone-body, .phone-container { scrollbar-width: none; -ms
         }
     });
     
-    // Inicialização
     refreshAllData();
 </script>
 </body>
