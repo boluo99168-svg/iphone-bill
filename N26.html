@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — 完整最终版</title>
+<title>N26 截图工具 — 精修状态栏版</title>
 <!-- Font Awesome 6 (仅用于WiFi图标) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -103,6 +103,7 @@ body::after {
   z-index: 5;
 }
 
+/* ===== 状态栏 - 精修比例 ===== */
 .sbar {
   display: flex;
   justify-content: space-between;
@@ -125,60 +126,75 @@ body::after {
 .sbar-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
+/* 信号图标 - 精修比例 */
 #signalIcon {
-  transform: scale(0.9);
+  transform: scale(0.85);
   display: block;
 }
 #signalIcon rect {
   shape-rendering: geometricPrecision;
 }
 
+/* WiFi图标 - 精修比例 */
 .fa-wifi {
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(235,235,245,0.9);
   display: inline-block;
   filter: none;
   opacity: 0.9;
 }
 
-.batt-wrap {
+/* 电池 - 精修比例（实心白色，无边框） */
+.battery {
   display: flex;
   align-items: center;
+  position: relative;
+  margin-left: 2px;
 }
-.batt-body {
+.battery-icon {
+  position: relative;
   width: 24px;
   height: 11px;
-  border: 1.2px solid rgba(235,235,245,0.6);
-  border-radius: 2px;
-  position: relative;
-  background: transparent;
+  background: #fff;
+  border-radius: 2.5px;
 }
-.batt-body::after {
+.battery-icon::after {
   content: '';
   position: absolute;
-  right: -4px;
+  right: -2.8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 2.5px;
+  width: 2.2px;
   height: 4px;
-  background: rgba(235,235,245,0.5);
-  border-radius: 0 1px 1px 0;
+  background: #fff;
+  border-radius: 0 1.2px 1.2px 0;
 }
-.batt-fill {
+.battery-icon.low {
+  background: #ff3b30;
+}
+.battery-icon.low::after {
+  background: #ff3b30;
+}
+.battery-percent {
   position: absolute;
-  left: 1.5px;
-  top: 1.5px;
-  height: calc(100% - 3px);
-  border-radius: 1px;
-  background: rgba(255,255,255,0.85);
-  transition: width 0.1s;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #000;
+  white-space: nowrap;
+  z-index: 2;
 }
-.batt-fill.red { background: #ff3b30 !important; }
+.battery-percent.low {
+  color: #fff;
+}
 
-/* 返回栏 - 已恢复 */
+/* 返回栏 */
 .back-bar {
   display: flex;
   align-items: center;
@@ -392,7 +408,7 @@ body::after {
 
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">完整最终版 · 含返回栏</div>
+  <div class="sub">精修状态栏 · 比例协调</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
@@ -437,6 +453,7 @@ body::after {
 
 <div id="capture">
 
+  <!-- 状态栏 - 精修比例 -->
   <div class="sbar">
     <span class="sbar-time" id="d_time">14:16</span>
     <div class="sbar-right">
@@ -446,16 +463,17 @@ body::after {
         <rect x="10" y="3" width="3" height="9" rx="1" fill="rgba(255,255,255,0.92)"/>
         <rect x="15" y="1" width="3" height="11" rx="1" fill="rgba(255,255,255,0.92)"/>
       </svg>
-      <i class="fa-solid fa-wifi" id="wifiIcon" style="color: rgba(235,235,245,0.9); font-size: 12px;"></i>
-      <div class="batt-wrap">
-        <div class="batt-body">
-          <div class="batt-fill" id="d_bfill" style="width:13px"></div>
+      <i class="fa-solid fa-wifi" id="wifiIcon"></i>
+      <!-- 精修电池 -->
+      <div class="battery">
+        <div class="battery-icon" id="batteryIcon">
+          <span class="battery-percent" id="battPercent">59</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 返回栏 - 已恢复 -->
+  <!-- 返回栏 -->
   <div class="back-bar">
     <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
       <path d="M8.5 1.5L1.5 8L8.5 14.5" stroke="rgba(235,235,245,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -650,11 +668,18 @@ function refresh() {
   let pct = parseInt(v('i_batt'));
   if (isNaN(pct)) pct = 59;
   pct = Math.max(0, Math.min(100, pct));
-  const fw = Math.max(2, (pct / 100) * 20);
-  const fill = g('d_bfill');
-  if (fill) {
-    fill.style.width = fw + 'px';
-    fill.classList.toggle('red', pct <= 20);
+  
+  const percentSpan = document.getElementById('battPercent');
+  const batteryIcon = document.getElementById('batteryIcon');
+  
+  percentSpan.textContent = pct;
+  
+  if (pct > 20) {
+    batteryIcon.classList.remove('low');
+    percentSpan.classList.remove('low');
+  } else {
+    batteryIcon.classList.add('low');
+    percentSpan.classList.add('low');
   }
   
   updateSignal();
