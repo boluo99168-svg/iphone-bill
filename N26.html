@@ -8,7 +8,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
-/* 全局字体渲染优化 - 模拟iOS原生质感 */
 * {
   margin: 0;
   padding: 0;
@@ -20,7 +19,6 @@
   font-feature-settings: "kern" 1;
 }
 
-/* SF Pro 字体栈 - 使用苹果系统原生字体 */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
   background: #000;
@@ -35,7 +33,6 @@ body {
   position: relative;
 }
 
-/* iOS 噪点层 - 真实感核心 🔥 */
 body::after {
   content: "";
   position: fixed;
@@ -47,7 +44,6 @@ body::after {
   z-index: 9999;
 }
 
-/* ─── 控制面板 ─── */
 .ctrl {
   width: 270px;
   background: #242424;
@@ -79,7 +75,6 @@ body::after {
 .cbtn-teal { background:#2BD8C8; color:#111; }
 .cbtn-dark { background:#2c2c2e; color:#fff; }
 
-/* ─── 手机截图区域 ─── */
 #capture {
   width: 393px;
   background: #000;
@@ -94,7 +89,6 @@ body::after {
   filter: saturate(0.96) contrast(1.02);
 }
 
-/* 屏幕玻璃层 🔥 */
 #capture::after {
   content: "";
   position: absolute;
@@ -109,7 +103,6 @@ body::after {
   z-index: 5;
 }
 
-/* ── 状态栏（带模糊+灰度） ── */
 .sbar {
   display: flex;
   justify-content: space-between;
@@ -135,7 +128,6 @@ body::after {
   gap: 4px;
 }
 
-/* 信号图标 - 精确缩放 + 抗锯齿优化 */
 #signalIcon {
   transform: scale(0.9);
   display: block;
@@ -144,7 +136,6 @@ body::after {
   shape-rendering: geometricPrecision;
 }
 
-/* WiFi图标 - 清晰无模糊 */
 .fa-wifi {
   font-size: 12px;
   color: rgba(235,235,245,0.9);
@@ -153,7 +144,6 @@ body::after {
   opacity: 0.9;
 }
 
-/* 电池区域（无百分比，只显示图标） */
 .batt-wrap {
   display: flex;
   align-items: center;
@@ -188,7 +178,6 @@ body::after {
 }
 .batt-fill.red { background: #ff3b30 !important; }
 
-/* ── 内容区（加玻璃质感） ── */
 .content {
   background: #111;
   backdrop-filter: blur(20px);
@@ -199,7 +188,6 @@ body::after {
   z-index: 1;
 }
 
-/* 下箭头 - 更贴顶部 */
 .chevron-row {
   padding: 2px 0 2px 16px;
   flex-shrink: 0;
@@ -208,7 +196,6 @@ body::after {
   display: block;
 }
 
-/* 顶部三要素 - 极致收紧 */
 .txn-name {
   font-size: 22px;
   font-weight: 600;
@@ -239,7 +226,6 @@ body::after {
   flex-shrink: 0;
 }
 
-/* ── 操作按钮 - 上移更紧凑 ── */
 .actions {
   display: flex;
   justify-content: center;
@@ -276,7 +262,6 @@ body::after {
   line-height: 1.35;
 }
 
-/* ── 分区标题 - 更贴边更紧 ── */
 .section-title {
   font-size: 20px;
   font-weight: 600;
@@ -286,7 +271,6 @@ body::after {
   flex-shrink: 0;
 }
 
-/* ── 卡片 - 增强玻璃质感+更淡分割线 ── */
 .card {
   margin: 0 14px 12px;
   background: rgba(28,28,30,0.88);
@@ -345,7 +329,6 @@ body::after {
   color: rgba(235,235,245,0.78);
 }
 
-/* Tags 区域 - 放在底部（原图有） */
 .tags-footer {
   flex: 1;
   display: flex;
@@ -365,7 +348,6 @@ body::after {
   min-height: 20px;
 }
 
-/* 底部 Home Bar */
 .home-bar {
   height: 34px;
   display: flex;
@@ -388,20 +370,19 @@ body::after {
 </head>
 <body>
 
-<!-- ═══════════ 控制面板 ═══════════ -->
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">最终真机版 · 原图级还原</div>
+  <div class="sub">最终真机版 · 支持千位分隔符</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
-  <div class="field"><label>💰 金额（不要千位分隔符，如 75,00 €）</label>
-    <input id="i_amount" value="75,00 €"></div>
+  <div class="field"><label>💰 金额（支持千位分隔符，如 23.673,00 €）</label>
+    <input id="i_amount" value="23.673,00 €"></div>
   <div class="field"><label>📅 交易日期</label>
     <input id="i_date" value="Mittwoch, 2. April 2025, 14:16"></div>
   <div class="field"><label>🏷️ 类别 (Kategorie)</label>
     <input id="i_kat" value="Gutschriften"></div>
-  <div class="field"><label>🏦 收款账户 (Zu) — 单行显示</label>
+  <div class="field"><label>🏦 收款账户 (Zu)</label>
     <input id="i_zu" value="Hauptkonto"></div>
   <div class="field"><label>🔄 交易类型</label>
     <input id="i_type" value="Echtzeitüberweisung"></div>
@@ -414,7 +395,6 @@ body::after {
   <div class="field"><label>🔋 电池电量 (%)</label>
     <input id="i_batt" type="number" min="0" max="100" value="59"></div>
 
-  <!-- 信号强度调节（1-4格，iOS真实逻辑） -->
   <div class="field"><label>📶 信号强度 (1-4格)</label>
     <input id="i_signal" type="range" min="1" max="4" step="1" value="4">
     <div style="display: flex; justify-content: space-between; margin-top: 4px;">
@@ -423,7 +403,6 @@ body::after {
     </div>
   </div>
 
-  <!-- WiFi 信号质量调节 -->
   <div class="field"><label>📡 WiFi 信号质量</label>
     <input id="i_wifi" type="range" min="0.2" max="1" step="0.01" value="1">
     <div style="display: flex; justify-content: space-between; margin-top: 4px;">
@@ -436,25 +415,18 @@ body::after {
   <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 4K 截图</button>
 </div>
 
-<!-- ═══════════ 截图主区域 — Tags已恢复，金额颜色 #2BD8C8 ═══════════ -->
 <div id="capture">
 
-  <!-- 状态栏（带模糊+灰度） -->
   <div class="sbar">
     <span class="sbar-time" id="d_time">14:16</span>
     <div class="sbar-right">
-      <!-- 信号图标 -->
       <svg id="signalIcon" width="20" height="12" viewBox="0 0 20 12">
         <rect x="0" y="7" width="3" height="5" rx="1" fill="rgba(255,255,255,0.92)"/>
         <rect x="5" y="5" width="3" height="7" rx="1" fill="rgba(255,255,255,0.92)"/>
         <rect x="10" y="3" width="3" height="9" rx="1" fill="rgba(255,255,255,0.92)"/>
         <rect x="15" y="1" width="3" height="11" rx="1" fill="rgba(255,255,255,0.92)"/>
       </svg>
-
-      <!-- WiFi图标 -->
       <i class="fa-solid fa-wifi" id="wifiIcon" style="color: rgba(235,235,245,0.9); font-size: 12px;"></i>
-
-      <!-- 电池 -->
       <div class="batt-wrap">
         <div class="batt-body">
           <div class="batt-fill" id="d_bfill" style="width:13px"></div>
@@ -464,7 +436,6 @@ body::after {
   </div>
 
   <div class="content">
-    <!-- 下箭头 -->
     <div class="chevron-row">
       <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
         <path d="M2 2L10 10L18 2" stroke="rgba(235,235,245,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -472,10 +443,9 @@ body::after {
     </div>
 
     <div class="txn-name" id="d_name">Esteban Cuerva De La Fuente</div>
-    <div class="txn-amount" id="d_amount">75,00 €</div>
+    <div class="txn-amount" id="d_amount">23.673,00 €</div>
     <div class="txn-date" id="d_date">Mittwoch, 2. April 2025, 14:16</div>
 
-    <!-- 操作按钮 -->
     <div class="actions">
       <div class="action-item">
         <div class="act-circle act-teal">
@@ -511,10 +481,8 @@ body::after {
       </div>
     </div>
 
-    <!-- Details 卡片 -->
     <div class="section-title">Details</div>
     <div class="card">
-      <!-- Kategorie 行 -->
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -543,7 +511,6 @@ body::after {
         <span class="row-arrow">›</span>
       </div>
 
-      <!-- Zu 行 — 单行显示 -->
       <div class="row">
         <div class="ico ico-teal">
           <svg width="22" height="16" viewBox="0 0 26 18" fill="none">
@@ -554,11 +521,10 @@ body::after {
         </div>
         <div class="row-text">
           <div class="rlabel">Zu</div>
-          <div class="rval" id="d_zu" style="margin-left: 0;">Hauptkonto</div>
+          <div class="rval" id="d_zu">Hauptkonto</div>
         </div>
       </div>
 
-      <!-- Transaktionstyp 行 -->
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -577,7 +543,6 @@ body::after {
         </div>
       </div>
 
-      <!-- Verwendungszweck 行 -->
       <div class="row">
         <div class="ico ico-gray">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
@@ -599,7 +564,6 @@ body::after {
       </div>
     </div>
 
-    <!-- Notizen - 原始折角文档图标 -->
     <div class="section-title">Notizen</div>
     <div class="card">
       <div class="row">
@@ -614,7 +578,6 @@ body::after {
       </div>
     </div>
 
-    <!-- Tags 区域 - 已恢复（原图有） -->
     <div class="tags-footer">
       <div class="tags-title">Tags</div>
       <div class="tags-spacer"></div>
@@ -626,42 +589,29 @@ body::after {
 </div>
 
 <script>
-// 更新信号强度
 function updateSignal() {
   const level = parseInt(document.getElementById('i_signal').value);
   const bars = document.querySelectorAll('#signalIcon rect');
-  
   const activeColor = 'rgba(255,255,255,0.92)';
   const inactiveColor = 'rgba(255,255,255,0.22)';
-  
   bars.forEach((bar, index) => {
-    if (index < level) {
-      bar.setAttribute('fill', activeColor);
-    } else {
-      bar.setAttribute('fill', inactiveColor);
-    }
+    bar.setAttribute('fill', index < level ? activeColor : inactiveColor);
   });
 }
 
-// 更新WiFi信号质量（透明度）
 function updateWifi() {
   const wifiVal = parseFloat(document.getElementById('i_wifi').value);
   const wifiIcon = document.getElementById('wifiIcon');
   if (wifiIcon) wifiIcon.style.opacity = wifiVal;
 }
 
-// 刷新所有UI
 function refresh() {
   const g = id => document.getElementById(id);
   const v = id => document.getElementById(id).value.trim();
 
   if (g('d_name')) g('d_name').textContent = v('i_name') || 'Esteban Cuerva De La Fuente';
-  if (g('d_amount')) {
-    let amount = v('i_amount') || '75,00 €';
-    // 移除可能出现的千位分隔符（点号）
-    amount = amount.replace(/\./g, '');
-    g('d_amount').textContent = amount;
-  }
+  // 金额：原样显示，不做任何处理，支持千位分隔符
+  if (g('d_amount')) g('d_amount').textContent = v('i_amount') || '23.673,00 €';
   if (g('d_date')) g('d_date').textContent = v('i_date') || 'Mittwoch, 2. April 2025, 14:16';
   if (g('d_kat')) g('d_kat').textContent = v('i_kat') || 'Gutschriften';
   if (g('d_zu')) g('d_zu').textContent = v('i_zu') || 'Hauptkonto';
@@ -684,26 +634,18 @@ function refresh() {
   updateWifi();
 }
 
-// 固定3倍缩放截图
 async function doShot() {
   const btn = document.querySelector('.cbtn-dark');
   if (!btn) return;
-  
   const orig = btn.textContent;
   btn.textContent = '⏳ 生成中...';
   btn.disabled = true;
-  
   refresh();
   await new Promise(r => setTimeout(r, 100));
-  
   try {
     const el = document.getElementById('capture');
     if (!el) throw new Error('截图区域不存在');
-    
-    if (typeof html2canvas === 'undefined') {
-      throw new Error('html2canvas库加载失败，请刷新页面重试');
-    }
-    
+    if (typeof html2canvas === 'undefined') throw new Error('html2canvas库加载失败');
     const canvas = await html2canvas(el, {
       scale: 3,
       backgroundColor: '#000000',
@@ -711,23 +653,19 @@ async function doShot() {
       useCORS: false,
       allowTaint: false
     });
-    
     const link = document.createElement('a');
-    const timestamp = Date.now();
-    link.download = `n26_${timestamp}.png`;
+    link.download = `n26_${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
-    
   } catch(e) {
     console.error('截图错误:', e);
-    alert('截图失败: ' + (e.message || '未知错误，请刷新页面后重试'));
+    alert('截图失败: ' + (e.message || '未知错误'));
   } finally {
     btn.textContent = orig;
     btn.disabled = false;
   }
 }
 
-// 监听输入
 document.querySelectorAll('input, select').forEach(el => {
   el.addEventListener('input', refresh);
   el.addEventListener('change', refresh);
