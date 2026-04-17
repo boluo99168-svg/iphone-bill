@@ -2,265 +2,731 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>N26 UI — Final</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>N26 截图工具 — 终极优化版</title>
+<!-- Font Awesome 6 (仅用于WiFi图标) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+/* 全局字体渲染优化 - 模拟iOS原生质感 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
 }
 
-body{
-  background:#111;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
-  display:flex;
-  justify-content:center;
-  padding:40px;
+/* SF Pro 字体栈 - 使用苹果系统原生字体 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  background: #000;
+  color: rgba(235,235,245,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 36px 24px;
+  gap: 30px;
+  flex-wrap: wrap;
+  position: relative;
 }
 
-/* 主容器 */
-#capture{
-  width:390px;
-  background:#111;
-  color:#fff;
+/* iOS 噪点层 - 真实感核心 🔥 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.4;
+  z-index: 9999;
 }
 
-/* 状态栏 */
-.status{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 18px 4px 20px;
-  font-size:14px;
-  font-weight:500;
+/* ─── 控制面板 ─── */
+.ctrl {
+  width: 270px;
+  background: #242424;
+  border-radius: 22px;
+  padding: 20px 16px;
+  border: 1px solid #333;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  color: #fff;
+}
+.ctrl h3 { font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:3px; }
+.ctrl .sub {
+  font-size:11px; color:#8e8e93; margin-bottom:18px;
+  padding-left:8px; border-left:3px solid #2BC7B8;
+}
+.field { margin-bottom:12px; }
+.field label { display:block; font-size:11px; font-weight:500; color:#aeaeb2; margin-bottom:5px; }
+.ctrl input, .ctrl select {
+  width:100%; padding:9px 11px;
+  background:#151515; border:1px solid #2c2c2e;
+  border-radius:10px; font-size:13px; color:#fff; outline:none;
+}
+.ctrl input:focus { border-color:#2BC7B8; }
+.cbtn {
+  width:100%; padding:11px; border-radius:12px; border:none;
+  font-size:13px; font-weight:600; cursor:pointer; margin-top:10px;
+}
+.cbtn-teal { background:#2BC7B8; color:#111; }
+.cbtn-dark { background:#2c2c2e; color:#fff; }
+
+/* ─── 手机截图区域 ─── */
+#capture {
+  width: 393px;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 700px;
+  transform: translateZ(0);
+  position: relative;
+  image-rendering: crisp-edges;
+  filter: saturate(0.96) contrast(1.02);
 }
 
-/* 返回 */
-.back{
-  display:flex;
-  align-items:center;
-  padding:6px 16px;
-  font-size:15px;
+/* 屏幕玻璃层 🔥 */
+#capture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.01) 20%,
+    transparent 40%
+  );
+  z-index: 5;
 }
 
-.back-arrow{
-  font-size:16px;
-  margin-right:4px;
+/* ── 状态栏（带模糊+灰度） ── */
+.sbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px 6px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
+  backdrop-filter: blur(6px);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.sbar-time {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  color: rgba(235,235,245,0.9);
+}
+.sbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-/* 标题区 */
-.name{
-  font-size:20px;
-  font-weight:600;
-  padding:0 20px;
+/* 信号图标 - 精确缩放 + 抗锯齿优化 + 排除全局模糊 */
+#signalIcon {
+  transform: scale(0.9);
+  display: block;
+  filter: none !important;
+}
+#signalIcon rect {
+  shape-rendering: geometricPrecision;
+  filter: drop-shadow(0 0 0.2px rgba(255,255,255,0.2));
 }
 
-.amount{
-  font-size:36px;
-  font-weight:600;
-  color:#30d5c8;
-  padding:0 20px;
-  margin-top:4px;
+/* WiFi图标微调 - 增加模糊+亮度降低 */
+.fa-wifi {
+  font-size: 12px;
+  color: rgba(235,235,245,0.9);
+  display: inline-block;
+  filter: blur(0.15px) brightness(0.85);
 }
 
-.date{
-  font-size:13px;
-  color:#8e8e93;
-  padding:0 20px;
-  margin-top:4px;
+/* 电池区域（无百分比，只显示图标） */
+.batt-wrap {
+  display: flex;
+  align-items: center;
+}
+.batt-body {
+  width: 24px;
+  height: 11px;
+  border: 1.2px solid rgba(235,235,245,0.6);
+  border-radius: 2px;
+  position: relative;
+  background: transparent;
+}
+.batt-body::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5px;
+  height: 4px;
+  background: rgba(235,235,245,0.5);
+  border-radius: 0 1px 1px 0;
+}
+.batt-fill {
+  position: absolute;
+  left: 1.5px;
+  top: 1.5px;
+  height: calc(100% - 3px);
+  border-radius: 1px;
+  background: rgba(235,235,245,0.9);
+  transition: width 0.1s;
+}
+.batt-fill.red { background: #ff3b30 !important; }
+
+/* ── 内容区（加轻微模糊感） ── */
+.content {
+  background: #111;
+  backdrop-filter: blur(20px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
-/* 操作区 */
-.actions{
-  display:flex;
-  justify-content:space-between;
-  padding:16px 24px;
+/* 下箭头 - 更贴顶部 */
+.chevron-row {
+  padding: 2px 0 2px 16px;
+  flex-shrink: 0;
+}
+.chevron-row svg {
+  display: block;
 }
 
-.action{
-  text-align:center;
-  width:30%;
+/* 顶部三要素 - 极致收紧 */
+.txn-name {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: rgba(235,235,245,0.85);
+  padding: 0 20px;
+  margin-top: 2px;
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+.txn-amount {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  color: rgba(43,199,184,0.92);
+  padding: 0 20px 0 20px;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+.txn-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.6);
+  padding: 0 20px 0 20px;
+  margin-top: -1px;
+  flex-shrink: 0;
 }
 
-.circle{
-  width:44px;
-  height:44px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:0 auto;
+/* ── 操作按钮 - 上移更紧凑 ── */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+}
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 72px;
+}
+.act-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.act-teal { background: #2BC7B8; }
+.act-dark {
+  background: transparent;
+  border: 1.5px solid rgba(235,235,245,0.28);
+}
+.act-label {
+  font-size: 10px;
+  letter-spacing: -0.1px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.6);
+  text-align: center;
+  line-height: 1.35;
 }
 
-.teal{background:#30d5c8;}
-.dark{
-  background:#1c1c1e;
-  border:1px solid rgba(255,255,255,0.08);
+/* ── 分区标题 - 更贴边更紧 ── */
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(235,235,245,0.9);
+  padding: 8px 20px 6px;
+  letter-spacing: -0.2px;
+  flex-shrink: 0;
 }
 
-.label{
-  font-size:10px;
-  color:#8e8e93;
-  margin-top:6px;
+/* ── 卡片 - 带边缘泛白内阴影 ── */
+.card {
+  margin: 0 14px 12px;
+  background: #1c1c1e;
+  border-radius: 13px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.04), 0 6px 16px rgba(0,0,0,0.4);
+}
+/* 最后一张卡片底部间距收紧 */
+.card:last-of-type {
+  margin-bottom: 8px;
+}
+.row {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  /* 分割线更淡 - 提升真实感 🔥 */
+  border-bottom: 0.5px solid rgba(255,255,255,0.025);
+  gap: 12px;
+  min-height: 56px;
+}
+.row:last-child { border-bottom: none; }
+
+.ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ico-gray  { background: #2c2c2e; }
+.ico-teal  { background: #183c3c; }
+
+.row-text { flex:1; min-width:0; }
+.row-text .rlabel {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.6);
+  margin-bottom: 2px;
+}
+.row-text .rval {
+  font-size: 15px;
+  font-weight: 450;
+  color: rgba(235,235,245,0.82);
+}
+.row-arrow {
+  color: rgba(235,235,245,0.4);
+  font-size: 18px;
+  font-weight: 300;
+  margin-left: 4px;
+}
+.row-copy { color: rgba(235,235,245,0.4); margin-left: 4px; }
+
+.notiz-text {
+  flex:1;
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.82);
 }
 
-/* section */
-.section{
-  font-size:18px;
-  font-weight:700;
-  padding:0 20px;
-  margin:12px 0 6px;
+/* Tags 区域 */
+.tags-footer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.tags-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: rgba(235,235,245,0.9);
+  padding: 8px 20px 6px;
+  letter-spacing: -0.2px;
+  margin-top: 8px;
+}
+.tags-spacer {
+  flex: 1;
+  min-height: 20px;
 }
 
-/* 卡片 */
-.card{
-  margin:0 14px 14px;
-  background:#1c1c1e;
-  border-radius:12px;
-  overflow:hidden;
+/* Home Bar 更灰更真实 */
+.home-bar {
+  height: 34px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 7px;
+  background: #111;
+  flex-shrink: 0;
+  margin-top: auto;
+  position: relative;
+  z-index: 2;
+}
+.home-bar div {
+  width: 134px;
+  height: 4.5px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
 }
 
-.row{
-  display:flex;
-  align-items:center;
-  padding:12px 14px;
-  border-bottom:1px solid #262628;
-  gap:12px;
-}
-
-.row:last-child{border:none;}
-
-.icon{
-  width:32px;
-  height:32px;
-  border-radius:8px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.gray{background:#2c2c2e;}
-.tealBox{background:#1f3f3c;}
-
-.text small{
-  font-size:11px;
-  color:#8e8e93;
-}
-
-.text div{
-  font-size:14px;
-}
-
-.arrow{
-  margin-left:auto;
-  color:#636366;
-}
-
-.home{
-  height:5px;
-  width:134px;
-  background:rgba(255,255,255,0.25);
-  margin:20px auto;
-  border-radius:3px;
+/* 非信号图标的柔化 + 亮度降低（更真实） */
+svg:not(#signalIcon):not(#signalIcon rect) {
+  filter: blur(0.25px) brightness(0.9);
 }
 </style>
 </head>
-
 <body>
 
+<!-- ═══════════ 控制面板 ═══════════ -->
+<div class="ctrl">
+  <h3>N26 截图工具</h3>
+  <div class="sub">终极优化版 · 分割线更淡</div>
+
+  <div class="field"><label>👤 收款人姓名</label>
+    <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
+  <div class="field"><label>💰 金额</label>
+    <input id="i_amount" value="75,00 €"></div>
+  <div class="field"><label>📅 交易日期</label>
+    <input id="i_date" value="Mittwoch, 2. April 2025, 14:16"></div>
+  <div class="field"><label>🏷️ 类别 (Kategorie)</label>
+    <input id="i_kat" value="Gutschriften"></div>
+  <div class="field"><label>🏦 收款账户 (Zu)</label>
+    <input id="i_zu" value="Hauptkonto"></div>
+  <div class="field"><label>🔄 交易类型</label>
+    <input id="i_type" value="Echtzeitüberweisung"></div>
+  <div class="field"><label>📝 用途备注</label>
+    <input id="i_zweck" value="1"></div>
+  <div class="field"><label>◀ 返回按钮文字</label>
+    <input id="i_back" value="TikTok"></div>
+  <div class="field"><label>🕐 状态栏时间</label>
+    <input id="i_time" value="14:16"></div>
+  <div class="field"><label>🔋 电池电量 (%)</label>
+    <input id="i_batt" type="number" min="0" max="100" value="59"></div>
+
+  <!-- 信号强度调节（1-4格，iOS真实逻辑） -->
+  <div class="field"><label>📶 信号强度 (1-4格)</label>
+    <input id="i_signal" type="range" min="1" max="4" step="1" value="4">
+    <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+      <span style="font-size: 10px; color:#8e8e93;">弱</span>
+      <span style="font-size: 10px; color:#8e8e93;">强</span>
+    </div>
+  </div>
+
+  <!-- WiFi 信号质量调节 -->
+  <div class="field"><label>📡 WiFi 信号质量</label>
+    <input id="i_wifi" type="range" min="0.2" max="1" step="0.01" value="1">
+    <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+      <span style="font-size: 10px; color:#8e8e93;">弱</span>
+      <span style="font-size: 10px; color:#8e8e93;">强</span>
+    </div>
+  </div>
+
+  <button class="cbtn cbtn-teal" onclick="refresh()">✨ 更新预览</button>
+  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 3倍缩放截图</button>
+</div>
+
+<!-- ═══════════ 截图主区域 — 分割线更淡 + 最后卡片间距收紧 ═══════════ -->
 <div id="capture">
 
-<div class="status">
-  <span>14:16</span>
-  <span>59%</span>
+  <!-- 状态栏（带模糊+灰度） -->
+  <div class="sbar">
+    <span class="sbar-time" id="d_time">14:16</span>
+    <div class="sbar-right">
+      <!-- 信号图标 - 终极真实方案 -->
+      <svg id="signalIcon" width="20" height="12" viewBox="0 0 20 12">
+        <rect x="0" y="7" width="3" height="5" rx="1" fill="rgba(255,255,255,0.92)"/>
+        <rect x="5" y="5" width="3" height="7" rx="1" fill="rgba(255,255,255,0.92)"/>
+        <rect x="10" y="3" width="3" height="9" rx="1" fill="rgba(255,255,255,0.92)"/>
+        <rect x="15" y="1" width="3" height="11" rx="1" fill="rgba(255,255,255,0.92)"/>
+      </svg>
+
+      <!-- WiFi图标 -->
+      <i class="fa-solid fa-wifi" id="wifiIcon" style="color: rgba(235,235,245,0.9); font-size: 12px;"></i>
+
+      <!-- 电池 -->
+      <div class="batt-wrap">
+        <div class="batt-body">
+          <div class="batt-fill" id="d_bfill" style="width:13px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- 下箭头 - 绝对顶部结构 -->
+    <div class="chevron-row">
+      <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
+        <path d="M2 2L10 10L18 2" stroke="rgba(235,235,245,0.6)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="txn-name" id="d_name">Esteban Cuerva De La Fuente</div>
+    <div class="txn-amount" id="d_amount">75,00 €</div>
+    <div class="txn-date" id="d_date">Mittwoch, 2. April 2025, 14:16</div>
+
+    <!-- 操作按钮 -->
+    <div class="actions">
+      <div class="action-item">
+        <div class="act-circle act-teal">
+          <svg width="22" height="22" viewBox="0 0 16 16" fill="none">
+            <rect x="1" y="1" width="5" height="5" rx="1.2" stroke="rgba(0,0,0,0.85)" stroke-width="1.5"/>
+            <rect x="10" y="1" width="5" height="5" rx="1.2" stroke="rgba(0,0,0,0.85)" stroke-width="1.5"/>
+            <rect x="10" y="10" width="5" height="5" rx="1.2" stroke="rgba(0,0,0,0.85)" stroke-width="1.5"/>
+            <path d="M2.2 12H6M6 12L4.6 10.6M6 12L4.6 13.4"
+                  stroke="rgba(0,0,0,0.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="act-label">Geld an einen<br>Space senden</div>
+      </div>
+
+      <div class="action-item">
+        <div class="act-circle act-dark">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="rgba(235,235,245,0.9)" d="M11 20v-7.6l-5-5V10H4V4h6v2H7.4l5.6 5.6V20zm3.85-9.4L13.4 9.15L16.6 6H14V4h6v6h-2V7.4z"/>
+          </svg>
+        </div>
+        <div class="act-label">Einkommensverteil<br>er</div>
+      </div>
+
+      <div class="action-item">
+        <div class="act-circle act-dark">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="rgba(235,235,245,0.85)" stroke-width="1.6"/>
+            <line x1="12" y1="7" x2="12" y2="13" stroke="rgba(235,235,245,0.85)" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="12" cy="16.5" r="1.2" fill="rgba(235,235,245,0.85)"/>
+          </svg>
+        </div>
+        <div class="act-label">Zum Support</div>
+      </div>
+    </div>
+
+    <!-- Details 卡片 -->
+    <div class="section-title">Details</div>
+    <div class="card">
+      <!-- Kategorie 行 — 最终精调版图标 -->
+      <div class="row">
+        <div class="ico ico-gray">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M4.2 5.2 H19.8 V14.8 H9.7 M4.2 11.4 V5.2"
+                  stroke="rgba(235,235,245,0.52)"
+                  stroke-width="1.45"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+            <circle cx="12.7" cy="10" r="1.1"
+                    fill="rgba(235,235,245,0.68)"/>
+            <path d="M4.8 14.1 H7.9"
+                  stroke="rgba(235,235,245,0.52)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"/>
+            <path d="M6.7 13 L8.3 14.1 L6.7 15.2"
+                  stroke="rgba(235,235,245,0.52)"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="row-text">
+          <div class="rlabel">Kategorie</div>
+          <div class="rval" id="d_kat">Gutschriften</div>
+        </div>
+        <span class="row-arrow">›</span>
+      </div>
+
+      <div class="row">
+        <div class="ico ico-teal">
+          <svg width="22" height="16" viewBox="0 0 26 18" fill="none">
+            <rect x="1" y="1" width="24" height="16" rx="2.5" fill="#2BC7B8"/>
+            <rect x="1" y="6" width="24" height="3.5" fill="#1a5550"/>
+            <rect x="3" y="11" width="7" height="2.5" rx="0.8" fill="#1a5550"/>
+          </svg>
+        </div>
+        <div class="row-text">
+          <div class="rlabel">Zu</div>
+          <div class="rval" id="d_zu">Hauptkonto</div>
+        </div>
+      </div>
+
+      <!-- Transaktionstyp 行 — 直角卡片图标 -->
+      <div class="row">
+        <div class="ico ico-gray">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <rect x="7" y="8" width="13" height="9" rx="0"
+                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6" stroke-linejoin="round"/>
+            <rect x="3" y="4" width="13" height="9" rx="0"
+                  fill="#1c1c1e" stroke-linejoin="round"/>
+            <rect x="3" y="4" width="13" height="9" rx="0"
+                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6" stroke-linejoin="round"/>
+            <circle cx="6.5" cy="7" r="1.2" fill="rgba(235,235,245,0.75)"/>
+          </svg>
+        </div>
+        <div class="row-text">
+          <div class="rlabel">Transaktionstyp</div>
+          <div class="rval" id="d_type">Echtzeitüberweisung</div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="ico ico-gray">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <line x1="8" y1="9" x2="16" y2="9"/>
+            <line x1="8" y1="13" x2="13" y2="13"/>
+          </svg>
+        </div>
+        <div class="row-text">
+          <div class="rlabel">Verwendungszweck</div>
+          <div class="rval" id="d_zweck">1</div>
+        </div>
+        <div class="row-copy">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.4)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notizen 卡片 - 最后一张，底部间距已收紧 -->
+    <div class="section-title">Notizen</div>
+    <div class="card">
+      <div class="row">
+        <div class="ico ico-gray">
+          <svg width="18" height="20" viewBox="0 0 20 24" fill="none" stroke="rgba(235,235,245,0.6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/>
+            <polyline points="13 2 13 8 19 8"/>
+          </svg>
+        </div>
+        <div class="notiz-text">Notiz hinzufügen</div>
+        <span class="row-arrow">›</span>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="tags-footer">
+      <div class="tags-title">Tags</div>
+      <div class="tags-spacer"></div>
+    </div>
+
+  </div>
+
+  <div class="home-bar"><div></div></div>
 </div>
 
-<div class="back">
-  <span class="back-arrow">‹</span> TikTok
-</div>
+<script>
+// 更新信号强度 - 终极真实方案：亮格纯白，暗格极淡冷灰
+function updateSignal() {
+  const level = parseInt(document.getElementById('i_signal').value);
+  const bars = document.querySelectorAll('#signalIcon rect');
+  
+  const activeColor = 'rgba(255,255,255,0.92)';
+  const inactiveColor = 'rgba(255,255,255,0.22)';
+  
+  bars.forEach((bar, index) => {
+    if (index < level) {
+      bar.setAttribute('fill', activeColor);
+    } else {
+      bar.setAttribute('fill', inactiveColor);
+    }
+  });
+}
 
-<div class="name">Esteban Cuerva De La Fuente</div>
-<div class="amount">75,00 €</div>
-<div class="date">Mittwoch, 2. April 2025, 14:16</div>
+// 更新WiFi信号质量（透明度）
+function updateWifi() {
+  const wifiVal = parseFloat(document.getElementById('i_wifi').value);
+  const wifiIcon = document.getElementById('wifiIcon');
+  wifiIcon.style.opacity = wifiVal;
+}
 
-<!-- 操作 -->
-<div class="actions">
+// 刷新所有UI
+function refresh() {
+  const g = id => document.getElementById(id);
+  const v = id => document.getElementById(id).value.trim();
 
-<div class="action">
-<div class="circle teal"></div>
-<div class="label">Geld an einen<br>Space senden</div>
-</div>
+  g('d_name').textContent   = v('i_name')   || 'Esteban Cuerva De La Fuente';
+  g('d_amount').textContent = v('i_amount') || '75,00 €';
+  g('d_date').textContent   = v('i_date')   || 'Mittwoch, 2. April 2025, 14:16';
+  g('d_kat').textContent    = v('i_kat')    || 'Gutschriften';
+  g('d_zu').textContent     = v('i_zu')     || 'Hauptkonto';
+  g('d_type').textContent   = v('i_type')   || 'Echtzeitüberweisung';
+  g('d_zweck').textContent  = v('i_zweck')  || '1';
+  g('d_back').textContent   = v('i_back')   || 'TikTok';
+  g('d_time').textContent   = v('i_time')   || '14:16';
 
-<div class="action">
-<div class="circle dark"></div>
-<div class="label">Einkommensverteiler</div>
-</div>
+  let pct = parseInt(v('i_batt'));
+  if (isNaN(pct)) pct = 59;
+  pct = Math.max(0, Math.min(100, pct));
+  const fw = Math.max(2, (pct / 100) * 20);
+  const fill = g('d_bfill');
+  fill.style.width = fw + 'px';
+  fill.classList.toggle('red', pct <= 20);
+  
+  updateSignal();
+  updateWifi();
+}
 
-<div class="action">
-<div class="circle dark"></div>
-<div class="label">Zum Support</div>
-</div>
+// 固定3倍缩放截图
+async function doShot() {
+  const btn = document.querySelectorAll('.cbtn')[1];
+  const orig = btn.textContent;
+  btn.textContent = '⏳ 生成中...';
+  btn.disabled = true;
+  refresh();
+  await new Promise(r => setTimeout(r, 120));
+  try {
+    const el = document.getElementById('capture');
+    const c = await html2canvas(el, {
+      scale: 3,
+      width: 393,
+      height: el.scrollHeight,
+      windowWidth: 393,
+      windowHeight: el.scrollHeight,
+      backgroundColor: '#000',
+      logging: false,
+      useCORS: true
+    });
+    const a = document.createElement('a');
+    a.download = 'n26_' + Date.now() + '.png';
+    a.href = c.toDataURL('image/png', 1.0);
+    a.click();
+  } catch(e) {
+    console.error(e);
+    alert('截图失败，请刷新后重试');
+  } finally {
+    btn.textContent = orig;
+    btn.disabled = false;
+  }
+}
 
-</div>
+// 监听输入
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', refresh);
+  el.addEventListener('change', refresh);
+});
+document.getElementById('i_signal').addEventListener('input', updateSignal);
+document.getElementById('i_wifi').addEventListener('input', updateWifi);
 
-<!-- Details -->
-<div class="section">Details</div>
-<div class="card">
-
-<div class="row">
-<div class="icon gray"></div>
-<div class="text">
-<small>Kategorie</small>
-<div>Gutschriften</div>
-</div>
-<div class="arrow">›</div>
-</div>
-
-<div class="row">
-<div class="icon tealBox"></div>
-<div class="text">
-<small>Zu</small>
-<div>Hauptkonto</div>
-</div>
-</div>
-
-<div class="row">
-<div class="icon gray"></div>
-<div class="text">
-<small>Transaktionstyp</small>
-<div>Echtzeitüberweisung</div>
-</div>
-</div>
-
-<div class="row">
-<div class="icon gray"></div>
-<div class="text">
-<small>Verwendungszweck</small>
-<div>1</div>
-</div>
-</div>
-
-</div>
-
-<!-- Notizen -->
-<div class="section">Notizen</div>
-<div class="card">
-<div class="row">
-<div class="icon gray"></div>
-<div class="text">Notiz hinzufügen</div>
-<div class="arrow">›</div>
-</div>
-</div>
-
-<div class="section">Tags</div>
-<div style="padding:0 20px;color:#636366;font-size:13px;">Keine Tags</div>
-
-<div class="home"></div>
-
-</div>
-
+refresh();
+</script>
 </body>
 </html>
