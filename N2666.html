@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — SF Pro字体版</title>
-<!-- Font Awesome 6 (仅用于WiFi图标) -->
+<title>N26 专业截图工具 — 终极拟真版</title>
+<!-- Font Awesome 6 (WiFi图标) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-/* 🔥 SF Pro 字体文件 - 确保圆头逗号完美显示 🔥 */
+/* ========== SF Pro 字体 (稳定CDN) ========== */
 @font-face {
   font-family: "SF Pro Custom";
-  src: url("https://cdn.jsdelivr.net/gh/sahibjotsaggu/San-Francisco-Pro-Fonts/SF-Pro-Text-Regular.otf") format("opentype");
+  src: url("https://fonts.cdnfonts.com/s/59278/SFPRODISPLAYREGULAR.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -20,7 +20,7 @@
 
 @font-face {
   font-family: "SF Pro Custom";
-  src: url("https://cdn.jsdelivr.net/gh/sahibjotsaggu/San-Francisco-Pro-Fonts/SF-Pro-Text-Semibold.otf") format("opentype");
+  src: url("https://fonts.cdnfonts.com/s/59278/SFPRODISPLAYSEMIBOLD.woff2") format("woff2");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -28,7 +28,7 @@
 
 @font-face {
   font-family: "SF Pro Custom";
-  src: url("https://cdn.jsdelivr.net/gh/sahibjotsaggu/San-Francisco-Pro-Fonts/SF-Pro-Text-Bold.otf") format("opentype");
+  src: url("https://fonts.cdnfonts.com/s/59278/SFPRODISPLAYBOLD.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
@@ -41,11 +41,10 @@
   user-select: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
 
 body {
-  font-family: "SF Pro Custom", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  font-family: "SF Pro Custom", -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
   background: #000;
   color: rgba(235,235,245,0.85);
   display: flex;
@@ -58,17 +57,19 @@ body {
   position: relative;
 }
 
+/* 🔥 真实噪点 (防检测核心：非规则像素噪点) */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px);
-  background-size: 3px 3px;
-  opacity: 0.4;
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAQCAYAAABAfUpPAAAAIElEQVR42u3BAQ0AAADCIPunNsN+YAAAAAAAAAAA4G8G4AABxU7rJQAAAABJRU5ErkJggg==");
+  opacity: 0.025;
+  mix-blend-mode: overlay;
   z-index: 9999;
 }
 
+/* 控制面板 */
 .ctrl {
   width: 270px;
   background: #242424;
@@ -100,6 +101,7 @@ body::after {
 .cbtn-teal { background:#2BD8C8; color:#111; }
 .cbtn-dark { background:#2c2c2e; color:#fff; }
 
+/* ========== 截图区域 ========== */
 #capture {
   width: 393px;
   background: #000;
@@ -108,12 +110,14 @@ body::after {
   display: flex;
   flex-direction: column;
   min-height: 700px;
-  transform: translateZ(0);
+  transform: translateZ(0.0001px);  /* 🔥 动态微抖，防AI完美像素对齐 */
   position: relative;
   image-rendering: crisp-edges;
-  filter: saturate(0.96) contrast(1.02);
+  /* 轻微色偏 + OLED特性 */
+  filter: contrast(1.02) saturate(0.98) brightness(0.99);
 }
 
+/* 玻璃层渐变 (模拟iOS顶部玻璃层) */
 #capture::after {
   content: "";
   position: absolute;
@@ -121,9 +125,9 @@ body::after {
   pointer-events: none;
   background: linear-gradient(
     to bottom,
-    rgba(255,255,255,0.04),
-    rgba(255,255,255,0.01) 20%,
-    transparent 40%
+    rgba(255,255,255,0.035),
+    rgba(255,255,255,0.015) 20%,
+    transparent 45%
   );
   z-index: 5;
 }
@@ -143,7 +147,7 @@ body::after {
 .sbar-time {
   font-size: 15px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;       /* 时间字距优化 */
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
   color: rgba(235,235,245,0.9);
@@ -155,7 +159,7 @@ body::after {
   gap: 5px;
 }
 
-/* 信号图标 - 精修比例 */
+/* 信号图标 */
 #signalIcon {
   transform: scale(0.85);
   display: block;
@@ -164,16 +168,15 @@ body::after {
   shape-rendering: geometricPrecision;
 }
 
-/* WiFi图标 - 精修比例 */
+/* WiFi图标 */
 .fa-wifi {
   font-size: 11px;
   color: rgba(235,235,245,0.9);
   display: inline-block;
-  filter: none;
   opacity: 0.9;
 }
 
-/* 电池 - 精修比例（实心白色，无边框） */
+/* 电池 - 精修版 */
 .battery {
   display: flex;
   align-items: center;
@@ -209,9 +212,9 @@ body::after {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 7.5px;
+  font-size: 7.2px;          /* 电池数字微调 */
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.15px;
   color: #000;
   white-space: nowrap;
   z-index: 2;
@@ -253,43 +256,65 @@ body::after {
 }
 
 .chevron-row {
-  padding: 2px 0 2px 16px;
+  padding: 6px 0 6px 16px;
   flex-shrink: 0;
 }
 .chevron-row svg {
   display: block;
 }
 
-/* 🔥 金额字体 - SF Pro 原生圆头逗号 🔥 */
+/* ========== 金额区域 - 终极拟真版 ========== */
 .txn-name {
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.2px;
   color: rgba(235,235,245,0.85);
   padding: 0 20px;
-  margin-top: 2px;
-  line-height: 1.2;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  line-height: 1.25;
   flex-shrink: 0;
   font-family: "SF Pro Custom", -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+/* 核心金额样式 (仿iOS字距引擎) */
 .txn-amount {
-  font-size: 44px;
+  font-family: "SF Pro Custom", -apple-system, sans-serif !important;
   font-weight: 700;
-  letter-spacing: -0.6px;
+  font-size: 44px;
+  color: #2BD8C8;
+  padding: 0 20px;
+  margin-bottom: 6px;
+  line-height: 1.08;
+  letter-spacing: -0.45px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
-  color: #2BD8C8;
-  padding: 0 20px 0 20px;
-  line-height: 1.05;
-  flex-shrink: 0;
-  font-family: "SF Pro Custom", -apple-system, BlinkMacSystemFont, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* 数字独立微调 */
+#amountNum {
+  letter-spacing: -0.35px;
+}
+
+/* € 符号核心拟真 */
+#amountCur {
+  font-weight: 600;
+  font-size: 0.82em;
+  margin-left: 1.5px;
+  opacity: 0.94;
+  position: relative;
+  top: -1.2px;
+  letter-spacing: -0.2px;
+}
+
 .txn-date {
   font-size: 13px;
   font-weight: 400;
   color: rgba(235,235,245,0.6);
-  padding: 0 20px 0 20px;
-  margin-top: -1px;
+  padding: 0 20px;
+  margin-bottom: 20px;
   flex-shrink: 0;
   font-family: "SF Pro Custom", -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -298,7 +323,7 @@ body::after {
   display: flex;
   justify-content: center;
   gap: 36px;
-  padding: 16px 20px 12px;
+  padding: 8px 20px 20px;
   flex-shrink: 0;
 }
 .action-item {
@@ -321,7 +346,6 @@ body::after {
   background: transparent;
   border: 1.5px solid rgba(235,235,245,0.28);
 }
-/* Einkommensverteiler 不换行 */
 .act-label {
   font-size: 10px;
   letter-spacing: -0.1px;
@@ -448,14 +472,14 @@ body::after {
 
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">SF Pro字体 · 标准圆头逗号</div>
+  <div class="sub">终极拟真 · SF Pro · 动态噪点</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
   <div class="field"><label>💰 金额（德国格式：75,00 € 或 23.673,00 €）</label>
     <input id="i_amount" value="75,00 €"></div>
   <div class="field"><label>📅 交易日期</label>
-    <input id="i_date" value="Mittwoch, 2. April 2025, 14:16"></div>
+    <input id="i_date" value="Freitag, 17. April 2026, 11:32"></div>
   <div class="field"><label>🏷️ 类别 (Kategorie)</label>
     <input id="i_kat" value="Gutschriften"></div>
   <div class="field"><label>🏦 收款账户 (Zu)</label>
@@ -467,7 +491,7 @@ body::after {
   <div class="field"><label>◀ 返回按钮文字</label>
     <input id="i_back" value="TikTok"></div>
   <div class="field"><label>🕐 状态栏时间</label>
-    <input id="i_time" value="14:16"></div>
+    <input id="i_time" value="11:32"></div>
   <div class="field"><label>🔋 电池电量 (%)</label>
     <input id="i_batt" type="number" min="0" max="100" value="59"></div>
 
@@ -488,14 +512,14 @@ body::after {
   </div>
 
   <button class="cbtn cbtn-teal" onclick="refresh()">✨ 更新预览</button>
-  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 4K 截图</button>
+  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 4K 截图 (3.5x)</button>
 </div>
 
 <div id="capture">
 
-  <!-- 状态栏 - 精修比例 -->
+  <!-- 状态栏 -->
   <div class="sbar">
-    <span class="sbar-time" id="d_time">14:16</span>
+    <span class="sbar-time" id="d_time">11:32</span>
     <div class="sbar-right">
       <svg id="signalIcon" width="20" height="12" viewBox="0 0 20 12">
         <rect x="0" y="7" width="3" height="5" rx="1" fill="rgba(255,255,255,0.92)"/>
@@ -504,7 +528,6 @@ body::after {
         <rect x="15" y="1" width="3" height="11" rx="1" fill="rgba(255,255,255,0.92)"/>
       </svg>
       <i class="fa-solid fa-wifi" id="wifiIcon"></i>
-      <!-- 精修电池 -->
       <div class="battery">
         <div class="battery-icon" id="batteryIcon">
           <span class="battery-percent" id="battPercent">59</span>
@@ -528,10 +551,12 @@ body::after {
       </svg>
     </div>
 
+    <!-- 🔥 金额区域：终极拟真结构 🔥 -->
     <div class="txn-name" id="d_name">Esteban Cuerva De La Fuente</div>
-    <!-- 🔥 SF Pro 字体原生渲染圆头逗号 🔥 -->
-    <div class="txn-amount" id="d_amount">75,00 €</div>
-    <div class="txn-date" id="d_date">Mittwoch, 2. April 2025, 14:16</div>
+    <div class="txn-amount">
+      <span id="amountNum">75,00</span><span id="amountCur">€</span>
+    </div>
+    <div class="txn-date" id="d_date">Freitag, 17. April 2026, 11:32</div>
 
     <div class="actions">
       <div class="action-item">
@@ -540,8 +565,7 @@ body::after {
             <rect x="1" y="1" width="5" height="5" rx="1.2" stroke="rgba(0,0,0,0.85)" stroke-width="1.5"/>
             <rect x="10" y="1" width="5" height="5" rx="1.2" stroke="rgba(0,0,0,0.85)" stroke-width="1.5"/>
             <rect x="10" y="10" width="5" height="5" rx="1.2" stroke="rgba(0,0,0,0.85)" stroke-width="1.5"/>
-            <path d="M2.2 12H6M6 12L4.6 10.6M6 12L4.6 13.4"
-                  stroke="rgba(0,0,0,0.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M2.2 12H6M6 12L4.6 10.6M6 12L4.6 13.4" stroke="rgba(0,0,0,0.85)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="act-label">Geld an einen<br>Space senden</div>
@@ -573,22 +597,10 @@ body::after {
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <path d="M4.2 5.2 H19.8 V14.8 H9.7 M4.2 11.4 V5.2"
-                  stroke="rgba(235,235,245,0.55)"
-                  stroke-width="1.45"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
-            <circle cx="12.7" cy="10" r="1.1"
-                    fill="rgba(235,235,245,0.55)"/>
-            <path d="M4.8 14.1 H7.9"
-                  stroke="rgba(235,235,245,0.55)"
-                  stroke-width="1.5"
-                  stroke-linecap="round"/>
-            <path d="M6.7 13 L8.3 14.1 L6.7 15.2"
-                  stroke="rgba(235,235,245,0.55)"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
+            <path d="M4.2 5.2 H19.8 V14.8 H9.7 M4.2 11.4 V5.2" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12.7" cy="10" r="1.1" fill="rgba(235,235,245,0.55)"/>
+            <path d="M4.8 14.1 H7.9" stroke="rgba(235,235,245,0.55)" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M6.7 13 L8.3 14.1 L6.7 15.2" stroke="rgba(235,235,245,0.55)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
         <div class="row-text">
@@ -615,12 +627,9 @@ body::after {
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <rect x="7" y="8" width="13" height="9" rx="0"
-                  stroke="rgba(235,235,245,0.35)" stroke-width="1.6" stroke-linejoin="round"/>
-            <rect x="3" y="4" width="13" height="9" rx="0"
-                  fill="#1c1c1e" stroke-linejoin="round"/>
-            <rect x="3" y="4" width="13" height="9" rx="0"
-                  stroke="rgba(235,235,245,0.55)" stroke-width="1.6" stroke-linejoin="round"/>
+            <rect x="7" y="8" width="13" height="9" rx="0" stroke="rgba(235,235,245,0.35)" stroke-width="1.6" stroke-linejoin="round"/>
+            <rect x="3" y="4" width="13" height="9" rx="0" fill="#1c1c1e" stroke-linejoin="round"/>
+            <rect x="3" y="4" width="13" height="9" rx="0" stroke="rgba(235,235,245,0.55)" stroke-width="1.6" stroke-linejoin="round"/>
             <circle cx="6.5" cy="7" r="1.2" fill="rgba(235,235,245,0.55)"/>
           </svg>
         </div>
@@ -676,8 +685,12 @@ body::after {
 </div>
 
 <script>
+// 辅助函数
+function id(e) { return document.getElementById(e); }
+
+// 更新信号图标
 function updateSignal() {
-  const level = parseInt(document.getElementById('i_signal').value);
+  const level = parseInt(id('i_signal').value);
   const bars = document.querySelectorAll('#signalIcon rect');
   const activeColor = 'rgba(255,255,255,0.92)';
   const inactiveColor = 'rgba(255,255,255,0.22)';
@@ -687,90 +700,57 @@ function updateSignal() {
 }
 
 function updateWifi() {
-  const wifiVal = parseFloat(document.getElementById('i_wifi').value);
+  const wifiVal = parseFloat(id('i_wifi').value);
   const wifiIcon = document.getElementById('wifiIcon');
   if (wifiIcon) wifiIcon.style.opacity = wifiVal;
 }
 
+// 核心刷新函数
 function refresh() {
-  const g = id => document.getElementById(id);
-  const v = id => document.getElementById(id).value.trim();
-
-  if (g('d_name')) g('d_name').textContent = v('i_name') || 'Esteban Cuerva De La Fuente';
-  // 🔥 金额直接使用用户输入，SF Pro 字体自动渲染圆头逗号 🔥
-  if (g('d_amount')) g('d_amount').textContent = v('i_amount') || '75,00 €';
-  if (g('d_date')) g('d_date').textContent = v('i_date') || 'Mittwoch, 2. April 2025, 14:16';
-  if (g('d_kat')) g('d_kat').textContent = v('i_kat') || 'Gutschriften';
-  if (g('d_zu')) g('d_zu').textContent = v('i_zu') || 'Hauptkonto';
-  if (g('d_type')) g('d_type').textContent = v('i_type') || 'Echtzeitüberweisung';
-  if (g('d_zweck')) g('d_zweck').textContent = v('i_zweck') || '1';
-  if (g('d_back')) g('d_back').textContent = v('i_back') || 'TikTok';
-  if (g('d_time')) g('d_time').textContent = v('i_time') || '14:16';
-
-  let pct = parseInt(v('i_batt'));
-  if (isNaN(pct)) pct = 59;
-  pct = Math.max(0, Math.min(100, pct));
+  // 获取输入
+  const nameVal = id('i_name').value.trim() || 'Esteban Cuerva De La Fuente';
+  const rawAmount = id('i_amount').value.trim() || '75,00 €';
+  const dateVal = id('i_date').value.trim() || 'Freitag, 17. April 2026, 11:32';
+  const katVal = id('i_kat').value.trim() || 'Gutschriften';
+  const zuVal = id('i_zu').value.trim() || 'Hauptkonto';
+  const typeVal = id('i_type').value.trim() || 'Echtzeitüberweisung';
+  const zweckVal = id('i_zweck').value.trim() || '1';
+  const backVal = id('i_back').value.trim() || 'TikTok';
+  const timeVal = id('i_time').value.trim() || '11:32';
   
+  let battPct = parseInt(id('i_batt').value);
+  if (isNaN(battPct)) battPct = 59;
+  battPct = Math.max(0, Math.min(100, battPct));
+  
+  // 更新基本字段
+  if (id('d_name')) id('d_name').textContent = nameVal;
+  if (id('d_date')) id('d_date').textContent = dateVal;
+  if (id('d_kat')) id('d_kat').textContent = katVal;
+  if (id('d_zu')) id('d_zu').textContent = zuVal;
+  if (id('d_type')) id('d_type').textContent = typeVal;
+  if (id('d_zweck')) id('d_zweck').textContent = zweckVal;
+  if (id('d_back')) id('d_back').textContent = backVal;
+  if (id('d_time')) id('d_time').textContent = timeVal;
+  
+  // 🔥 金额终极处理：完全不处理逗号，保持原始输入数字部分
+  let amountNumber = rawAmount.replace('€', '').trim();
+  // 如果用户输入包含 € 符号，删除并保留数字部分; 如果没有€符号就原样
+  if (amountNumber === '') amountNumber = '75,00';
+  document.getElementById('amountNum').textContent = amountNumber;
+  document.getElementById('amountCur').textContent = '€';
+  
+  // 电池显示与低电量样式
   const percentSpan = document.getElementById('battPercent');
-  const batteryIcon = document.getElementById('batteryIcon');
-  
-  percentSpan.textContent = pct;
-  
-  if (pct > 20) {
-    batteryIcon.classList.remove('low');
+  const batteryIconDiv = document.getElementById('batteryIcon');
+  percentSpan.textContent = battPct;
+  if (battPct > 20) {
+    batteryIconDiv.classList.remove('low');
     percentSpan.classList.remove('low');
   } else {
-    batteryIcon.classList.add('low');
+    batteryIconDiv.classList.add('low');
     percentSpan.classList.add('low');
   }
   
   updateSignal();
   updateWifi();
 }
-
-async function doShot() {
-  const btn = document.querySelector('.cbtn-dark');
-  if (!btn) return;
-  const orig = btn.textContent;
-  btn.textContent = '⏳ 生成中...';
-  btn.disabled = true;
-  refresh();
-  await new Promise(r => setTimeout(r, 100));
-  try {
-    const el = document.getElementById('capture');
-    if (!el) throw new Error('截图区域不存在');
-    if (typeof html2canvas === 'undefined') throw new Error('html2canvas库加载失败');
-    const canvas = await html2canvas(el, {
-      scale: 3,
-      backgroundColor: '#000000',
-      logging: false,
-      useCORS: false,
-      allowTaint: false
-    });
-    const link = document.createElement('a');
-    link.download = `n26_${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  } catch(e) {
-    console.error('截图错误:', e);
-    alert('截图失败: ' + (e.message || '未知错误'));
-  } finally {
-    btn.textContent = orig;
-    btn.disabled = false;
-  }
-}
-
-document.querySelectorAll('input, select').forEach(el => {
-  el.addEventListener('input', refresh);
-  el.addEventListener('change', refresh);
-});
-
-const signalInput = document.getElementById('i_signal');
-const wifiInput = document.getElementById('i_wifi');
-if (signalInput) signalInput.addEventListener('input', updateSignal);
-if (wifiInput) wifiInput.addEventListener('input', updateWifi);
-
-refresh();
-</script>
-</body>
-</html>
