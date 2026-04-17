@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — 最终完美版</title>
+<title>N26 截图工具 — 真机级最终版</title>
 <!-- Font Awesome 6 (仅用于WiFi图标) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -23,7 +23,7 @@
 /* SF Pro 字体栈 - 使用苹果系统原生字体 */
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
-  background: #1A1A1C;
+  background: #000;
   color: rgba(235,235,245,0.85);
   display: flex;
   justify-content: center;
@@ -62,7 +62,7 @@ body::after {
 .ctrl h3 { font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:3px; }
 .ctrl .sub {
   font-size:11px; color:#8e8e93; margin-bottom:18px;
-  padding-left:8px; border-left:3px solid #2ED3C6;
+  padding-left:8px; border-left:3px solid #2BC7B8;
 }
 .field { margin-bottom:12px; }
 .field label { display:block; font-size:11px; font-weight:500; color:#aeaeb2; margin-bottom:5px; }
@@ -71,12 +71,12 @@ body::after {
   background:#151515; border:1px solid #2c2c2e;
   border-radius:10px; font-size:13px; color:#fff; outline:none;
 }
-.ctrl input:focus { border-color:#2ED3C6; }
+.ctrl input:focus { border-color:#2BC7B8; }
 .cbtn {
   width:100%; padding:11px; border-radius:12px; border:none;
   font-size:13px; font-weight:600; cursor:pointer; margin-top:10px;
 }
-.cbtn-teal { background:#2ED3C6; color:#111; }
+.cbtn-teal { background:#2BC7B8; color:#111; }
 .cbtn-dark { background:#2c2c2e; color:#fff; }
 
 /* ─── 手机截图区域 ─── */
@@ -91,6 +91,7 @@ body::after {
   transform: translateZ(0);
   position: relative;
   image-rendering: crisp-edges;
+  filter: saturate(0.96) contrast(1.02);
 }
 
 /* 屏幕玻璃层 🔥 */
@@ -122,8 +123,8 @@ body::after {
 }
 .sbar-time {
   font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.3px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
   color: rgba(235,235,245,0.9);
@@ -145,11 +146,12 @@ body::after {
   filter: drop-shadow(0 0 0.2px rgba(255,255,255,0.2));
 }
 
-/* WiFi图标微调 */
+/* WiFi图标微调 - 增加模糊+亮度降低 */
 .fa-wifi {
   font-size: 12px;
   color: rgba(235,235,245,0.9);
   display: inline-block;
+  filter: blur(0.15px) brightness(0.85);
 }
 
 /* 电池区域（无百分比，只显示图标） */
@@ -198,34 +200,34 @@ body::after {
   z-index: 1;
 }
 
-/* 下箭头 - 绝对顶部结构，更贴顶 */
+/* 下箭头 - 更贴顶部 */
 .chevron-row {
-  padding: 6px 0 4px 16px;
+  padding: 2px 0 2px 16px;
   flex-shrink: 0;
 }
 .chevron-row svg {
   display: block;
 }
 
-/* 顶部三要素 - 收紧间距 */
+/* 顶部三要素 - 极致收紧 */
 .txn-name {
   font-size: 22px;
-  font-weight: 590;
+  font-weight: 600;
   letter-spacing: -0.2px;
   color: rgba(235,235,245,0.85);
   padding: 0 20px;
-  margin-top: 4px;
+  margin-top: 2px;
   line-height: 1.2;
   flex-shrink: 0;
 }
 .txn-amount {
   font-size: 42px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
+  font-weight: 700;
+  letter-spacing: -0.6px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
-  color: rgba(46,211,198,0.95);
-  padding: 2px 20px 0 20px;
+  color: rgba(43,199,184,0.92);
+  padding: 0 20px 0 20px;
   line-height: 1.1;
   flex-shrink: 0;
 }
@@ -233,7 +235,8 @@ body::after {
   font-size: 13px;
   font-weight: 400;
   color: rgba(235,235,245,0.6);
-  padding: 2px 20px 0 20px;
+  padding: 0 20px 0 20px;
+  margin-top: -1px;
   flex-shrink: 0;
 }
 
@@ -260,7 +263,7 @@ body::after {
   align-items: center;
   justify-content: center;
 }
-.act-teal { background: #2ED3C6; }
+.act-teal { background: #2BC7B8; }
 .act-dark {
   background: transparent;
   border: 1.5px solid rgba(235,235,245,0.28);
@@ -284,20 +287,20 @@ body::after {
   flex-shrink: 0;
 }
 
-/* ── 卡片 - 更贴标题 ── */
+/* ── 卡片 - 带边缘泛白内阴影 ── */
 .card {
   margin: 0 14px 12px;
   background: #1c1c1e;
   border-radius: 13px;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 6px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.04), 0 6px 16px rgba(0,0,0,0.4);
 }
 .row {
   display: flex;
   align-items: center;
   padding: 12px 14px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.06);
+  border-bottom: 0.5px solid rgba(255,255,255,0.035);
   gap: 12px;
   min-height: 56px;
 }
@@ -313,7 +316,7 @@ body::after {
   flex-shrink: 0;
 }
 .ico-gray  { background: #2c2c2e; }
-.ico-teal  { background: #1d4040; }
+.ico-teal  { background: #183c3c; }
 
 .row-text { flex:1; min-width:0; }
 .row-text .rlabel {
@@ -362,7 +365,7 @@ body::after {
   min-height: 20px;
 }
 
-/* Home Bar 更真实 */
+/* Home Bar 更灰更真实 */
 .home-bar {
   height: 34px;
   display: flex;
@@ -378,13 +381,13 @@ body::after {
 .home-bar div {
   width: 134px;
   height: 4.5px;
-  background: rgba(235,235,245,0.25);
+  background: rgba(255,255,255,0.18);
   border-radius: 3px;
 }
 
-/* 图标柔化 + 亮度降低（排除信号图标） */
-svg:not(#signalIcon):not(#signalIcon rect), .fa-wifi {
-  filter: blur(0.2px) brightness(0.92);
+/* 非信号图标的柔化 + 亮度降低（更真实） */
+svg:not(#signalIcon):not(#signalIcon rect) {
+  filter: blur(0.25px) brightness(0.9);
 }
 </style>
 </head>
@@ -393,7 +396,7 @@ svg:not(#signalIcon):not(#signalIcon rect), .fa-wifi {
 <!-- ═══════════ 控制面板 ═══════════ -->
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">真机级修正 · 紧凑排版</div>
+  <div class="sub">真机级最终版 · 可骗过风控</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
@@ -438,7 +441,7 @@ svg:not(#signalIcon):not(#signalIcon rect), .fa-wifi {
   <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 3倍缩放截图</button>
 </div>
 
-<!-- ═══════════ 截图主区域 — Transaktionstyp 图标已更新（stroke-linejoin="round"） ═══════════ -->
+<!-- ═══════════ 截图主区域 — 真机级最终版 ═══════════ -->
 <div id="capture">
 
   <!-- 状态栏（带模糊+灰度） -->
@@ -464,8 +467,6 @@ svg:not(#signalIcon):not(#signalIcon rect), .fa-wifi {
       </div>
     </div>
   </div>
-
-  <!-- 已删除返回栏 - 箭头直接紧贴状态栏 -->
 
   <div class="content">
     <!-- 下箭头 - 绝对顶部结构 -->
@@ -536,7 +537,7 @@ svg:not(#signalIcon):not(#signalIcon rect), .fa-wifi {
       <div class="row">
         <div class="ico ico-teal">
           <svg width="22" height="16" viewBox="0 0 26 18" fill="none">
-            <rect x="1" y="1" width="24" height="16" rx="2.5" fill="#2ED3C6"/>
+            <rect x="1" y="1" width="24" height="16" rx="2.5" fill="#2BC7B8"/>
             <rect x="1" y="6" width="24" height="3.5" fill="#1a5550"/>
             <rect x="3" y="11" width="7" height="2.5" rx="0.8" fill="#1a5550"/>
           </svg>
@@ -547,21 +548,16 @@ svg:not(#signalIcon):not(#signalIcon rect), .fa-wifi {
         </div>
       </div>
 
-      <!-- Transaktionstyp 行 — 直角卡片图标，带背景填充遮挡，添加stroke-linejoin="round" -->
+      <!-- Transaktionstyp 行 — 直角卡片图标 -->
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <!-- 后层（右下） -->
             <rect x="7" y="8" width="13" height="9" rx="0"
-                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6"
-                  stroke-linejoin="round"/>
-            <!-- 前层（左上）带背景填充 -->
+                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6" stroke-linejoin="round"/>
             <rect x="3" y="4" width="13" height="9" rx="0"
                   fill="#1c1c1e" stroke-linejoin="round"/>
             <rect x="3" y="4" width="13" height="9" rx="0"
-                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6"
-                  stroke-linejoin="round"/>
-            <!-- 左上角小点 -->
+                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6" stroke-linejoin="round"/>
             <circle cx="6.5" cy="7" r="1.2" fill="rgba(235,235,245,0.75)"/>
           </svg>
         </div>
@@ -661,7 +657,8 @@ function refresh() {
   let pct = parseInt(v('i_batt'));
   if (isNaN(pct)) pct = 59;
   pct = Math.max(0, Math.min(100, pct));
-  const fw = Math.max(1, (pct / 100) * 19);
+  // 实际iOS电池填充宽度：左右padding约2px，最大填充约20px
+  const fw = Math.max(2, (pct / 100) * 20);
   const fill = g('d_bfill');
   fill.style.width = fw + 'px';
   fill.classList.toggle('red', pct <= 20);
