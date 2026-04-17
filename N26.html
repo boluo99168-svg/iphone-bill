@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — 真机级最终版</title>
+<title>N26 截图工具 — 图标颜色统一版</title>
 <!-- Font Awesome 6 (仅用于WiFi图标) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -41,7 +41,7 @@ body::after {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px);
   background-size: 3px 3px;
   opacity: 0.4;
   z-index: 9999;
@@ -135,23 +135,22 @@ body::after {
   gap: 4px;
 }
 
-/* 信号图标 - 精确缩放 + 抗锯齿优化 + 排除全局模糊 */
+/* 信号图标 - 精确缩放 + 抗锯齿优化 */
 #signalIcon {
   transform: scale(0.9);
   display: block;
-  filter: none !important;
 }
 #signalIcon rect {
   shape-rendering: geometricPrecision;
-  filter: drop-shadow(0 0 0.2px rgba(255,255,255,0.2));
 }
 
-/* WiFi图标微调 - 增加模糊+亮度降低 */
+/* WiFi图标 - 清晰无模糊 */
 .fa-wifi {
   font-size: 12px;
   color: rgba(235,235,245,0.9);
   display: inline-block;
-  filter: blur(0.15px) brightness(0.85);
+  filter: none;
+  opacity: 0.9;
 }
 
 /* 电池区域（无百分比，只显示图标） */
@@ -184,7 +183,7 @@ body::after {
   top: 1.5px;
   height: calc(100% - 3px);
   border-radius: 1px;
-  background: rgba(235,235,245,0.9);
+  background: rgba(255,255,255,0.85);
   transition: width 0.1s;
 }
 .batt-fill.red { background: #ff3b30 !important; }
@@ -226,7 +225,7 @@ body::after {
   letter-spacing: -0.6px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
-  color: rgba(43,199,184,0.92);
+  color: rgba(43,199,184,0.82);
   padding: 0 20px 0 20px;
   line-height: 1.1;
   flex-shrink: 0;
@@ -300,7 +299,7 @@ body::after {
   display: flex;
   align-items: center;
   padding: 12px 14px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.035);
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
   gap: 12px;
   min-height: 56px;
 }
@@ -322,13 +321,13 @@ body::after {
 .row-text .rlabel {
   font-size: 11.5px;
   font-weight: 400;
-  color: rgba(235,235,245,0.6);
+  color: rgba(235,235,245,0.55);
   margin-bottom: 2px;
 }
 .row-text .rval {
   font-size: 15px;
   font-weight: 450;
-  color: rgba(235,235,245,0.82);
+  color: rgba(235,235,245,0.78);
 }
 .row-arrow {
   color: rgba(235,235,245,0.4);
@@ -342,7 +341,7 @@ body::after {
   flex:1;
   font-size: 15px;
   font-weight: 400;
-  color: rgba(235,235,245,0.82);
+  color: rgba(235,235,245,0.78);
 }
 
 /* Tags 区域 */
@@ -384,11 +383,6 @@ body::after {
   background: rgba(255,255,255,0.18);
   border-radius: 3px;
 }
-
-/* 非信号图标的柔化 + 亮度降低（更真实） */
-svg:not(#signalIcon):not(#signalIcon rect) {
-  filter: blur(0.25px) brightness(0.9);
-}
 </style>
 </head>
 <body>
@@ -396,7 +390,7 @@ svg:not(#signalIcon):not(#signalIcon rect) {
 <!-- ═══════════ 控制面板 ═══════════ -->
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">真机级最终版 · 可骗过风控</div>
+  <div class="sub">图标颜色统一 · 极致克制</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
@@ -438,10 +432,10 @@ svg:not(#signalIcon):not(#signalIcon rect) {
   </div>
 
   <button class="cbtn cbtn-teal" onclick="refresh()">✨ 更新预览</button>
-  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 3倍缩放截图</button>
+  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 4K 截图</button>
 </div>
 
-<!-- ═══════════ 截图主区域 — Kategorie图标已替换为最终精调版 ═══════════ -->
+<!-- ═══════════ 截图主区域 — 所有图标颜色已统一 ═══════════ -->
 <div id="capture">
 
   <!-- 状态栏（带模糊+灰度） -->
@@ -456,7 +450,7 @@ svg:not(#signalIcon):not(#signalIcon rect) {
         <rect x="15" y="1" width="3" height="11" rx="1" fill="rgba(255,255,255,0.92)"/>
       </svg>
 
-      <!-- WiFi图标 -->
+      <!-- WiFi图标 - 清晰无模糊 -->
       <i class="fa-solid fa-wifi" id="wifiIcon" style="color: rgba(235,235,245,0.9); font-size: 12px;"></i>
 
       <!-- 电池 -->
@@ -519,26 +513,23 @@ svg:not(#signalIcon):not(#signalIcon rect) {
     <!-- Details 卡片 -->
     <div class="section-title">Details</div>
     <div class="card">
-      <!-- Kategorie 行 — 图标已替换为最终精调版 -->
+      <!-- Kategorie 行 — 统一描边颜色 rgba(235,235,245,0.55) -->
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-            <!-- 外框（微圆角感） -->
             <path d="M4.2 5.2 H19.8 V14.8 H9.7 M4.2 11.4 V5.2"
-                  stroke="rgba(235,235,245,0.52)"
+                  stroke="rgba(235,235,245,0.55)"
                   stroke-width="1.45"
                   stroke-linecap="round"
                   stroke-linejoin="round"/>
-            <!-- 中间点 -->
             <circle cx="12.7" cy="10" r="1.1"
-                    fill="rgba(235,235,245,0.68)"/>
-            <!-- 箭头（加长 + 同色 + 保持克制） -->
+                    fill="rgba(235,235,245,0.55)"/>
             <path d="M4.8 14.1 H7.9"
-                  stroke="rgba(235,235,245,0.52)"
+                  stroke="rgba(235,235,245,0.55)"
                   stroke-width="1.5"
                   stroke-linecap="round"/>
             <path d="M6.7 13 L8.3 14.1 L6.7 15.2"
-                  stroke="rgba(235,235,245,0.52)"
+                  stroke="rgba(235,235,245,0.55)"
                   stroke-width="1.5"
                   stroke-linecap="round"
                   stroke-linejoin="round"/>
@@ -551,6 +542,7 @@ svg:not(#signalIcon):not(#signalIcon rect) {
         <span class="row-arrow">›</span>
       </div>
 
+      <!-- Zu 行 - 银行卡图标，统一描边颜色 -->
       <div class="row">
         <div class="ico ico-teal">
           <svg width="22" height="16" viewBox="0 0 26 18" fill="none">
@@ -565,17 +557,20 @@ svg:not(#signalIcon):not(#signalIcon rect) {
         </div>
       </div>
 
-      <!-- Transaktionstyp 行 — 直角卡片图标 -->
+      <!-- Transaktionstyp 行 — 统一描边颜色，后层更淡 -->
       <div class="row">
         <div class="ico ico-gray">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <!-- 后层（右下）更淡 -->
             <rect x="7" y="8" width="13" height="9" rx="0"
-                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6" stroke-linejoin="round"/>
+                  stroke="rgba(235,235,245,0.35)" stroke-width="1.6" stroke-linejoin="round"/>
+            <!-- 前层（左上）主色 -->
             <rect x="3" y="4" width="13" height="9" rx="0"
                   fill="#1c1c1e" stroke-linejoin="round"/>
             <rect x="3" y="4" width="13" height="9" rx="0"
-                  stroke="rgba(235,235,245,0.75)" stroke-width="1.6" stroke-linejoin="round"/>
-            <circle cx="6.5" cy="7" r="1.2" fill="rgba(235,235,245,0.75)"/>
+                  stroke="rgba(235,235,245,0.55)" stroke-width="1.6" stroke-linejoin="round"/>
+            <!-- 左上角小点 -->
+            <circle cx="6.5" cy="7" r="1.2" fill="rgba(235,235,245,0.55)"/>
           </svg>
         </div>
         <div class="row-text">
@@ -584,9 +579,10 @@ svg:not(#signalIcon):not(#signalIcon rect) {
         </div>
       </div>
 
+      <!-- Verwendungszweck 行 — 统一描边颜色 -->
       <div class="row">
         <div class="ico ico-gray">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             <line x1="8" y1="9" x2="16" y2="9"/>
             <line x1="8" y1="13" x2="13" y2="13"/>
@@ -597,7 +593,7 @@ svg:not(#signalIcon):not(#signalIcon rect) {
           <div class="rval" id="d_zweck">1</div>
         </div>
         <div class="row-copy">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.4)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(235,235,245,0.35)" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
             <rect x="9" y="9" width="13" height="13" rx="2"/>
             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
           </svg>
@@ -605,14 +601,18 @@ svg:not(#signalIcon):not(#signalIcon rect) {
       </div>
     </div>
 
-    <!-- Notizen -->
+    <!-- Notizen - 统一描边颜色 -->
     <div class="section-title">Notizen</div>
     <div class="card">
       <div class="row">
         <div class="ico ico-gray">
-          <svg width="18" height="20" viewBox="0 0 20 24" fill="none" stroke="rgba(235,235,245,0.6)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/>
-            <polyline points="13 2 13 8 19 8"/>
+          <svg width="18" height="20" viewBox="0 0 20 24" fill="none">
+            <rect x="3" y="3" width="14" height="18" rx="2"
+                  stroke="rgba(235,235,245,0.55)" stroke-width="1.45"/>
+            <line x1="6" y1="8" x2="14" y2="8"
+                  stroke="rgba(235,235,245,0.4)" stroke-width="1.3" stroke-linecap="round"/>
+            <line x1="6" y1="12" x2="12" y2="12"
+                  stroke="rgba(235,235,245,0.4)" stroke-width="1.3" stroke-linecap="round"/>
           </svg>
         </div>
         <div class="notiz-text">Notiz hinzufügen</div>
@@ -653,7 +653,7 @@ function updateSignal() {
 function updateWifi() {
   const wifiVal = parseFloat(document.getElementById('i_wifi').value);
   const wifiIcon = document.getElementById('wifiIcon');
-  wifiIcon.style.opacity = wifiVal;
+  if (wifiIcon) wifiIcon.style.opacity = wifiVal;
 }
 
 // 刷新所有UI
@@ -661,24 +661,25 @@ function refresh() {
   const g = id => document.getElementById(id);
   const v = id => document.getElementById(id).value.trim();
 
-  g('d_name').textContent   = v('i_name')   || 'Esteban Cuerva De La Fuente';
-  g('d_amount').textContent = v('i_amount') || '75,00 €';
-  g('d_date').textContent   = v('i_date')   || 'Mittwoch, 2. April 2025, 14:16';
-  g('d_kat').textContent    = v('i_kat')    || 'Gutschriften';
-  g('d_zu').textContent     = v('i_zu')     || 'Hauptkonto';
-  g('d_type').textContent   = v('i_type')   || 'Echtzeitüberweisung';
-  g('d_zweck').textContent  = v('i_zweck')  || '1';
-  g('d_back').textContent   = v('i_back')   || 'TikTok';
-  g('d_time').textContent   = v('i_time')   || '14:16';
+  if (g('d_name')) g('d_name').textContent = v('i_name') || 'Esteban Cuerva De La Fuente';
+  if (g('d_amount')) g('d_amount').textContent = v('i_amount') || '75,00 €';
+  if (g('d_date')) g('d_date').textContent = v('i_date') || 'Mittwoch, 2. April 2025, 14:16';
+  if (g('d_kat')) g('d_kat').textContent = v('i_kat') || 'Gutschriften';
+  if (g('d_zu')) g('d_zu').textContent = v('i_zu') || 'Hauptkonto';
+  if (g('d_type')) g('d_type').textContent = v('i_type') || 'Echtzeitüberweisung';
+  if (g('d_zweck')) g('d_zweck').textContent = v('i_zweck') || '1';
+  if (g('d_back')) g('d_back').textContent = v('i_back') || 'TikTok';
+  if (g('d_time')) g('d_time').textContent = v('i_time') || '14:16';
 
   let pct = parseInt(v('i_batt'));
   if (isNaN(pct)) pct = 59;
   pct = Math.max(0, Math.min(100, pct));
-  // 实际iOS电池填充宽度：左右padding约2px，最大填充约20px
   const fw = Math.max(2, (pct / 100) * 20);
   const fill = g('d_bfill');
-  fill.style.width = fw + 'px';
-  fill.classList.toggle('red', pct <= 20);
+  if (fill) {
+    fill.style.width = fw + 'px';
+    fill.classList.toggle('red', pct <= 20);
+  }
   
   updateSignal();
   updateWifi();
@@ -686,31 +687,41 @@ function refresh() {
 
 // 固定3倍缩放截图
 async function doShot() {
-  const btn = document.querySelectorAll('.cbtn')[1];
+  const btn = document.querySelector('.cbtn-dark');
+  if (!btn) return;
+  
   const orig = btn.textContent;
   btn.textContent = '⏳ 生成中...';
   btn.disabled = true;
+  
   refresh();
-  await new Promise(r => setTimeout(r, 120));
+  await new Promise(r => setTimeout(r, 100));
+  
   try {
     const el = document.getElementById('capture');
-    const c = await html2canvas(el, {
+    if (!el) throw new Error('截图区域不存在');
+    
+    if (typeof html2canvas === 'undefined') {
+      throw new Error('html2canvas库加载失败，请刷新页面重试');
+    }
+    
+    const canvas = await html2canvas(el, {
       scale: 3,
-      width: 393,
-      height: el.scrollHeight,
-      windowWidth: 393,
-      windowHeight: el.scrollHeight,
-      backgroundColor: '#000',
+      backgroundColor: '#000000',
       logging: false,
-      useCORS: true
+      useCORS: false,
+      allowTaint: false
     });
-    const a = document.createElement('a');
-    a.download = 'n26_' + Date.now() + '.png';
-    a.href = c.toDataURL('image/png', 1.0);
-    a.click();
+    
+    const link = document.createElement('a');
+    const timestamp = Date.now();
+    link.download = `n26_${timestamp}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    
   } catch(e) {
-    console.error(e);
-    alert('截图失败，请刷新后重试');
+    console.error('截图错误:', e);
+    alert('截图失败: ' + (e.message || '未知错误，请刷新页面后重试'));
   } finally {
     btn.textContent = orig;
     btn.disabled = false;
@@ -722,8 +733,11 @@ document.querySelectorAll('input, select').forEach(el => {
   el.addEventListener('input', refresh);
   el.addEventListener('change', refresh);
 });
-document.getElementById('i_signal').addEventListener('input', updateSignal);
-document.getElementById('i_wifi').addEventListener('input', updateWifi);
+
+const signalInput = document.getElementById('i_signal');
+const wifiInput = document.getElementById('i_wifi');
+if (signalInput) signalInput.addEventListener('input', updateSignal);
+if (wifiInput) wifiInput.addEventListener('input', updateWifi);
 
 refresh();
 </script>
