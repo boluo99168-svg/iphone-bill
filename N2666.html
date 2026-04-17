@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>N26 截图工具 — 苹果官方电池规范版</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 36px 24px;
+  gap: 30px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,0.008) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.4;
+  z-index: 9999;
+}
+
+.ctrl {
+  width: 270px;
+  background: #242424;
+  border-radius: 22px;
+  padding: 20px 16px;
+  border: 1px solid #333;
+  flex-shrink: 0;
+  z-index: 10;
+  color: #fff;
+}
+.ctrl h3 { font-size:1.1rem; font-weight:700; margin-bottom:3px; }
+.ctrl .sub {
+  font-size:11px; color:#8e8e93; margin-bottom:18px;
+  padding-left:8px; border-left:3px solid #2BD8C8;
+}
+.field { margin-bottom:12px; }
+.field label { display:block; font-size:11px; font-weight:500; color:#aeaeb2; margin-bottom:5px; }
+.ctrl input, .ctrl select {
+  width:100%; padding:9px 11px;
+  background:#151515; border:1px solid #2c2c2e;
+  border-radius:10px; font-size:13px; color:#fff; outline:none;
+}
+.ctrl input:focus { border-color:#2BD8C8; }
+.cbtn {
+  width:100%; padding:11px; border-radius:12px; border:none;
+  font-size:13px; font-weight:600; cursor:pointer; margin-top:10px;
+}
+.cbtn-teal { background:#2BD8C8; color:#111; }
+.cbtn-dark { background:#2c2c2e; color:#fff; }
+
+#capture {
+  width: 393px;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 700px;
+  position: relative;
+}
+
+.sbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px 6px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
+  backdrop-filter: blur(6px);
+  flex-shrink: 0;
+}
+.sbar-time {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+.sbar-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#signalIcon { transform: scale(0.9); display: block; }
+.fa-wifi { font-size: 12px; color: #fff; display: inline-block; opacity: 0.9; }
+
+/* 🔥 正确的 iPhone 电池图标规范 🔥
+   设计规范：
+   1. 默认白色外框 + 白色填充
+   2. 填充随电量变化（宽度减少）
+   3. 电池头凸起（小圆角矩形）
+   4. 电量≤20%时填充变红色
+   5. 百分比数字在填充上方，正常时黑色，低电量时白色
+*/
+.battery {
+  display: flex;
+  align-items: center;
+}
+.battery-icon {
+  position: relative;
+  width: 27px;
+  height: 13px;
+  border: 1.2px solid rgba(255,255,255,0.85);
+  border-radius: 3.5px;
+  background: transparent;
+}
+/* 电池头凸起 */
+.battery-icon::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5px;
+  height: 5px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 0 1.5px 1.5px 0;
+}
+/* 电池内部填充（随电量变化） */
+.battery-fill {
+  position: absolute;
+  left: 1.5px;
+  top: 1.5px;
+  height: calc(100% - 3px);
+  border-radius: 2px;
+  background: #fff;
+  transition: width 0.1s ease;
+}
+/* 低电量时填充变红色 */
+.battery-fill.low {
+  background: #ff3b30;
+}
+/* 低电量时电池头也变红 */
+.battery-icon.low::after {
+  background: #ff3b30;
+}
+/* 百分比数字 */
+.battery-percent {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #000;
+  white-space: nowrap;
+  z-index: 2;
+}
+/* 低电量时数字变白色 */
+.battery-percent.low {
+  color: #fff;
+}
+
+.back-bar {
+  display: flex;
+  align-items: center;
+  padding: 4px 14px 6px 14px;
+  background: #000;
+  gap: 2px;
+}
+.back-bar span { font-size: 15px; font-weight: 500; color: rgba(235,235,245,0.85); }
+
+.content {
+  background: #111;
+  backdrop-filter: blur(20px);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chevron-row { padding: 2px 0 2px 16px; }
+.txn-name {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: #fff;
+  padding: 0 20px;
+  margin-top: 2px;
+  line-height: 1.2;
+}
+.txn-amount {
+  font-size: 42px;
+  font-weight: 630;
+  letter-spacing: -0.5px;
+  color: #2BD8C8;
+  padding: 0 20px 0 20px;
+  line-height: 1.1;
+}
+.txn-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.6);
+  padding: 0 20px 0 20px;
+  margin-top: -1px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 36px;
+  padding: 16px 20px 12px;
+}
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  width: 72px;
+}
+.act-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.act-teal { background: #2BD8C8; }
+.act-dark { background: transparent; border: 1.5px solid rgba(255,255,255,0.28); }
+.act-label {
+  font-size: 10px;
+  letter-spacing: -0.1px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.6);
+  text-align: center;
+  line-height: 1.35;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  padding: 8px 20px 6px;
+  letter-spacing: -0.2px;
+}
+
+.card {
+  margin: 0 14px 12px;
+  background: rgba(28,28,30,0.88);
+  border-radius: 13px;
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 0 0.5px rgba(255,255,255,0.04), 0 6px 16px rgba(0,0,0,0.4);
+}
+.row {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.035);
+  gap: 12px;
+  min-height: 56px;
+}
+.row:last-child { border-bottom: none; }
+
+.ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ico-gray { background: #2c2c2e; }
+.ico-teal { background: #183c3c; }
+
+.row-text { flex: 1; }
+.row-text .rlabel {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.55);
+  margin-bottom: 2px;
+}
+.row-text .rval {
+  font-size: 15px;
+  font-weight: 450;
+  color: rgba(235,235,245,0.78);
+}
+.row-arrow {
+  color: rgba(235,235,245,0.4);
+  font-size: 18px;
+  font-weight: 300;
+  margin-left: 4px;
+}
+.row-copy { color: rgba(235,235,245,0.35); margin-left: 4px; }
+.notiz-text {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(235,235,245,0.78);
+}
+
+.tags-footer { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+.tags-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+  padding: 8px 20px 6px;
+  margin-top: 8px;
+}
+.tags-spacer { flex: 1; min-height: 20px; }
+
+.home-bar {
+  height: 34px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 7px;
+  background: #111;
+  margin-top: auto;
+}
+.home-bar div {
+  width: 134px;
+  height: 4.5px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 3px;
+}
+</style>
+</head>
+<body>
+
+<div class="ctrl">
+  <h3>N26 截图工具</h3>
+  <div class="sub">苹果官方电池规范 · 填充随电量变化</div>
+
+  <div class="field"><label>👤 收款人姓名</label><input id="i_name" value="Esteban Cuerva De La Fuente"></div>
+  <div class="field"><label>💰 金额</label><input id="i_amount" value="75,00 €"></div>
+  <div class="field"><label>📅 交易日期</label><input id="i_date" value="Mittwoch, 2. April 2025, 14:16"></div>
+  <div class="field"><label>🏷️ 类别</label><input id="i_kat" value="Gutschriften"></div>
+  <div class="field"><label>🏦 收款账户</label><input id="i_zu" value="Hauptkonto"></div>
+  <div class="field"><label>🔄 交易类型</label><input id="i_type" value="Echtzeitüberweisung"></div>
+  <div class="field"><label>📝 用途备注</label><input id="i_zweck" value="1"></div>
+  <div class="field"><label>◀ 返回按钮</label><input id="i_back" value="TikTok"></div>
+  <div class="field"><label>🕐 状态栏时间</label><input id="i_time" value="14:16"></div>
+  <div class="field"><label>🔋 电池电量 (%)</label><input id="i_batt" type="number" min="0" max="100" value="59"></div>
+
+  <div class="field"><label>📶 信号强度</label>
+    <input id="i_signal" type="range" min="1" max="4" step="1" value="4">
+    <div style="display: flex; justify-content: space-between;"><span style="font-size:10px;">弱</span><span style="font-size:10px;">强</span></div>
+  </div>
+
+  <div class="field"><label>📡 WiFi 质量</label>
+    <input id="i_wifi" type="range" min="0.2" max="1" step="0.01" value="1">
+    <div style="display: flex; justify-content: space-between;"><span style="font-size:10px;">弱</span><span style="font-size:10px;">强</span></div>
+  </div>
+
+  <button class="cbtn cbtn-teal" onclick="refresh()">✨ 更新预览</button>
+  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出截图</button>
+</div>
+
+<div id="capture">
+  <div class="sbar">
+    <span class="sbar-time" id="d_time">14:16</span>
+    <div class="sbar-right">
+      <svg id="signalIcon" width="20" height="12" viewBox="0 0 20 12">
+        <rect x="0" y="7" width="3" height="5" rx="1" fill="#fff"/>
+        <rect x="5" y="5" width="3" height="7" rx="1" fill="#fff"/>
+        <rect x="10" y="3" width="3" height="9" rx="1" fill="#fff"/>
+        <rect x="15" y="1" width="3" height="11" rx="1" fill="#fff"/>
+      </svg>
+      <i class="fa-solid fa-wifi" id="wifiIcon"></i>
+      <!-- 🔥 正确的 iPhone 电池：外框 + 内部填充 + 电池头 🔥 -->
+      <div class="battery">
+        <div class="battery-icon" id="batteryIcon">
+          <div class="battery-fill" id="batteryFill" style="width: 13px;"></div>
+          <span class="battery-percent" id="battPercent">59</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="back-bar">
+    <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+      <path d="M8.5 1.5L1.5 8L8.5 14.5" stroke="rgba(235,235,245,0.85)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span id="d_back">TikTok</span>
+  </div>
+
+  <div class="content">
+    <div class="chevron-row">
+      <svg width="20" height="12" viewBox="0 0 20 12"><path d="M2 2L10 10L18 2" stroke="rgba(235,235,245,0.6)" stroke-width="1.8" fill="none"/></svg>
+    </div>
+    <div class="txn-name" id="d_name">Esteban Cuerva De La Fuente</div>
+    <div class="txn-amount" id="d_amount">75,00 €</div>
+    <div class="txn-date" id="d_date">Mittwoch, 2. April 2025, 14:16</div>
+
+    <div class="actions">
+      <div class="action-item"><div class="act-circle act-teal"><svg width="22" height="22" viewBox="0 0 16 16"><rect x="1" y="1" width="5" height="5" rx="1.2" stroke="#000" stroke-width="1.5" fill="none"/><rect x="10" y="1" width="5" height="5" rx="1.2" stroke="#000" stroke-width="1.5" fill="none"/><rect x="10" y="10" width="5" height="5" rx="1.2" stroke="#000" stroke-width="1.5" fill="none"/><path d="M2.2 12H6M6 12L4.6 10.6M6 12L4.6 13.4" stroke="#000" stroke-width="1.5" fill="none"/></svg></div><div class="act-label">Geld an einen<br>Space senden</div></div>
+      <div class="action-item"><div class="act-circle act-dark"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M11 20v-7.6l-5-5V10H4V4h6v2H7.4l5.6 5.6V20zm3.85-9.4L13.4 9.15L16.6 6H14V4h6v6h-2V7.4z"/></svg></div><div class="act-label">Einkommensverteil<br>er</div></div>
+      <div class="action-item"><div class="act-circle act-dark"><svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke="#fff" stroke-width="1.6" fill="none"/><line x1="12" y1="7" x2="12" y2="13" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="16.5" r="1.2" fill="#fff"/></svg></div><div class="act-label">Zum Support</div></div>
+    </div>
+
+    <div class="section-title">Details</div>
+    <div class="card">
+      <div class="row"><div class="ico ico-gray"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4.2 5.2 H19.8 V14.8 H9.7 M4.2 11.4 V5.2" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" fill="none"/><circle cx="12.7" cy="10" r="1.1" fill="rgba(235,235,245,0.55)"/><path d="M4.8 14.1 H7.9" stroke="rgba(235,235,245,0.55)" stroke-width="1.5"/><path d="M6.7 13 L8.3 14.1 L6.7 15.2" stroke="rgba(235,235,245,0.55)" stroke-width="1.5"/></svg></div><div class="row-text"><div class="rlabel">Kategorie</div><div class="rval" id="d_kat">Gutschriften</div></div><span class="row-arrow">›</span></div>
+      <div class="row"><div class="ico ico-teal"><svg width="22" height="16" viewBox="0 0 26 18"><rect x="1" y="1" width="24" height="16" rx="2.5" fill="#2BD8C8"/><rect x="1" y="6" width="24" height="3.5" fill="#1a5550"/><rect x="3" y="11" width="7" height="2.5" rx="0.8" fill="#1a5550"/></svg></div><div class="row-text"><div class="rlabel">Zu</div><div class="rval" id="d_zu">Hauptkonto</div></div></div>
+      <div class="row"><div class="ico ico-gray"><svg width="22" height="22" viewBox="0 0 24 24"><rect x="7" y="8" width="13" height="9" rx="0" stroke="rgba(235,235,245,0.35)" stroke-width="1.6"/><rect x="3" y="4" width="13" height="9" rx="0" fill="#1c1c1e"/><rect x="3" y="4" width="13" height="9" rx="0" stroke="rgba(235,235,245,0.55)" stroke-width="1.6"/><circle cx="6.5" cy="7" r="1.2" fill="rgba(235,235,245,0.55)"/></svg></div><div class="row-text"><div class="rlabel">Transaktionstyp</div><div class="rval" id="d_type">Echtzeitüberweisung</div></div></div>
+      <div class="row"><div class="ico ico-gray"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" fill="none"/><line x1="8" y1="9" x2="16" y2="9" stroke="rgba(235,235,245,0.55)" stroke-width="1.45"/><line x1="8" y1="13" x2="13" y2="13" stroke="rgba(235,235,245,0.55)" stroke-width="1.45"/></svg></div><div class="row-text"><div class="rlabel">Verwendungszweck</div><div class="rval" id="d_zweck">1</div></div><div class="row-copy"><svg width="16" height="16" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" stroke="rgba(235,235,245,0.35)" stroke-width="1.45" fill="none"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="rgba(235,235,245,0.35)" stroke-width="1.45" fill="none"/></svg></div></div>
+    </div>
+
+    <div class="section-title">Notizen</div>
+    <div class="card"><div class="row"><div class="ico ico-gray"><svg width="18" height="20" viewBox="0 0 20 24"><path d="M13 2H5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" fill="none"/><polyline points="13 2 13 8 19 8" stroke="rgba(235,235,245,0.55)" stroke-width="1.45" fill="none"/></svg></div><div class="notiz-text">Notiz hinzufügen</div><span class="row-arrow">›</span></div></div>
+
+    <div class="tags-footer"><div class="tags-title">Tags</div><div class="tags-spacer"></div></div>
+  </div>
+  <div class="home-bar"><div></div></div>
+</div>
+
+<script>
+function updateSignal() {
+  const level = parseInt(document.getElementById('i_signal').value);
+  const bars = document.querySelectorAll('#signalIcon rect');
+  for (let i = 0; i < 4; i++) {
+    bars[i].setAttribute('fill', i < level ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.22)');
+  }
+}
+
+function updateWifi() {
+  document.getElementById('wifiIcon').style.opacity = parseFloat(document.getElementById('i_wifi').value);
+}
+
+function refresh() {
+  document.getElementById('d_name').textContent = document.getElementById('i_name').value.trim() || 'Esteban Cuerva De La Fuente';
+  document.getElementById('d_amount').textContent = document.getElementById('i_amount').value.trim() || '75,00 €';
+  document.getElementById('d_date').textContent = document.getElementById('i_date').value.trim() || 'Mittwoch, 2. April 2025, 14:16';
+  document.getElementById('d_kat').textContent = document.getElementById('i_kat').value.trim() || 'Gutschriften';
+  document.getElementById('d_zu').textContent = document.getElementById('i_zu').value.trim() || 'Hauptkonto';
+  document.getElementById('d_type').textContent = document.getElementById('i_type').value.trim() || 'Echtzeitüberweisung';
+  document.getElementById('d_zweck').textContent = document.getElementById('i_zweck').value.trim() || '1';
+  document.getElementById('d_back').textContent = document.getElementById('i_back').value.trim() || 'TikTok';
+  document.getElementById('d_time').textContent = document.getElementById('i_time').value.trim() || '14:16';
+
+  let pct = parseInt(document.getElementById('i_batt').value);
+  if (isNaN(pct)) pct = 59;
+  pct = Math.min(100, Math.max(0, pct));
+  
+  const percentSpan = document.getElementById('battPercent');
+  percentSpan.textContent = pct;
+  
+  // 🔥 正确逻辑：填充宽度随电量变化
+  // 电池内部可用宽度约 22px
+  const fillWidth = Math.max(1.5, (pct / 100) * 22);
+  const fill = document.getElementById('batteryFill');
+  fill.style.width = fillWidth + 'px';
+  
+  const batteryIcon = document.getElementById('batteryIcon');
+  
+  // 低电量时：填充变红，电池头变红，数字变白
+  if (pct <= 20) {
+    fill.classList.add('low');
+    batteryIcon.classList.add('low');
+    percentSpan.classList.add('low');
+  } else {
+    fill.classList.remove('low');
+    batteryIcon.classList.remove('low');
+    percentSpan.classList.remove('low');
+  }
+  
+  updateSignal();
+  updateWifi();
+}
+
+async function doShot() {
+  const btn = document.querySelector('.cbtn-dark');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ 生成中...';
+  btn.disabled = true;
+  refresh();
+  await new Promise(r => setTimeout(r, 100));
+  try {
+    const canvas = await html2canvas(document.getElementById('capture'), { scale: 3, backgroundColor: '#000000' });
+    const link = document.createElement('a');
+    link.download = 'n26.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  } catch(e) { alert('截图失败'); }
+  finally { btn.textContent = orig; btn.disabled = false; }
+}
+
+document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', refresh));
+refresh();
+</script>
+</body>
+</html>
