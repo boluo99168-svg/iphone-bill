@@ -3,16 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — 最终精调版</title>
+<title>N26 截图工具 — 终极真实版（带WiFi）</title>
+<!-- Font Awesome 6 (信号+WiFi图标) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; user-select:none; }
-
-body {
-  background: #1A1A1C;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+/* 全局字体渲染优化 - 模拟iOS原生质感 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1;
+}
+
+/* SF Pro 字体栈 - 使用苹果系统原生字体 */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  background: #1A1A1C;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -20,6 +31,19 @@ body {
   padding: 36px 24px;
   gap: 30px;
   flex-wrap: wrap;
+  position: relative;
+}
+
+/* iOS 噪点层 - 真实感核心 🔥 */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.4;
+  z-index: 9999;
 }
 
 /* ─── 控制面板 ─── */
@@ -30,11 +54,13 @@ body {
   padding: 20px 16px;
   border: 1px solid #333;
   flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 .ctrl h3 { font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:3px; }
 .ctrl .sub {
   font-size:11px; color:#8e8e93; margin-bottom:18px;
-  padding-left:8px; border-left:3px solid #2ED1C3;
+  padding-left:8px; border-left:3px solid #34D1BF;
 }
 .field { margin-bottom:12px; }
 .field label { display:block; font-size:11px; font-weight:500; color:#aeaeb2; margin-bottom:5px; }
@@ -43,12 +69,12 @@ body {
   background:#151515; border:1px solid #2c2c2e;
   border-radius:10px; font-size:13px; color:#fff; outline:none;
 }
-.ctrl input:focus { border-color:#2ED1C3; }
+.ctrl input:focus { border-color:#34D1BF; }
 .cbtn {
   width:100%; padding:11px; border-radius:12px; border:none;
   font-size:13px; font-weight:600; cursor:pointer; margin-top:10px;
 }
-.cbtn-teal { background:#2ED1C3; color:#111; }
+.cbtn-teal { background:#34D1BF; color:#111; }
 .cbtn-dark { background:#2c2c2e; color:#fff; }
 
 /* ─── 手机截图区域 ─── */
@@ -60,78 +86,67 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 700px;
+  transform: translateZ(0);
+  position: relative;
+  image-rendering: crisp-edges;
 }
 
-/* ── 状态栏（优化版） ── */
+/* 屏幕玻璃层 🔥 */
+#capture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.01) 20%,
+    transparent 40%
+  );
+  z-index: 5;
+}
+
+/* ── 状态栏（带光影渐变） ── */
 .sbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 18px 6px;
-  background: #000;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 .sbar-time {
   font-size: 15px;
-  font-weight: 590;
-  letter-spacing: 0;
+  font-weight: 500;
+  letter-spacing: -0.3px;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
   color: #fff;
 }
 .sbar-right {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+}
+/* 信号+WiFi图标微调 */
+.fa-signal, .fa-wifi {
+  font-size: 12px;
+  color: white;
+  display: inline-block;
 }
 
-/* 信号条 - 精确iOS风格 */
-.signal-bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-}
-.signal-bars span {
-  display: block;
-  width: 2.5px;
-  border-radius: 1px;
-  background: #fff;
-}
-.signal-bars span:nth-child(1) { height: 3px; opacity: 0.35; }
-.signal-bars span:nth-child(2) { height: 6px; opacity: 0.55; }
-.signal-bars span:nth-child(3) { height: 9px; opacity: 0.75; }
-.signal-bars span:nth-child(4) { height: 12px; opacity: 1; }
-
-/* WiFi图标 - 精确弧线 */
-.wifi-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 13px;
-}
-.wifi-icon svg {
-  width: 17px;
-  height: 12px;
-}
-
-/* 电池区域 */
+/* 电池区域（无百分比，只显示图标） */
 .batt-wrap {
   display: flex;
   align-items: center;
-  gap: 3px;
-}
-.batt-pct {
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  letter-spacing: -0.2px;
 }
 .batt-body {
   width: 24px;
   height: 11px;
   border: 1.2px solid rgba(255,255,255,0.7);
-  border-radius: 3px;
+  border-radius: 2px;
   position: relative;
   background: transparent;
 }
@@ -142,9 +157,9 @@ body {
   top: 50%;
   transform: translateY(-50%);
   width: 2.5px;
-  height: 5px;
+  height: 4px;
   background: rgba(255,255,255,0.6);
-  border-radius: 0 1.5px 1.5px 0;
+  border-radius: 0 1px 1px 0;
 }
 .batt-fill {
   position: absolute;
@@ -165,6 +180,8 @@ body {
   background: #000;
   gap: 2px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
 }
 .back-bar span {
   font-size: 15px;
@@ -172,12 +189,15 @@ body {
   color: #fff;
 }
 
-/* ── 内容区 - 自动撑满 ── */
+/* ── 内容区（加轻微模糊感） ── */
 .content {
   background: #111;
+  backdrop-filter: blur(20px);
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 /* 下箭头 */
@@ -191,27 +211,29 @@ body {
 
 .txn-name {
   font-size: 22px;
-  font-weight: 630;
+  font-weight: 590;
+  letter-spacing: -0.2px;
   color: #fff;
   padding: 0 20px;
   margin-top: 2px;
-  letter-spacing: -0.3px;
   line-height: 1.2;
   flex-shrink: 0;
 }
 .txn-amount {
   font-size: 42px;
-  font-weight: 700;
-  color: #2ED1C3;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  color: #34D1BF;
   padding: 4px 20px 0 20px;
-  letter-spacing: -0.8px;
   line-height: 1.1;
   flex-shrink: 0;
 }
 .txn-date {
   font-size: 13px;
   font-weight: 400;
-  color: #8E8E93;
+  color: rgba(235,235,245,0.6);
   padding: 6px 20px 0 20px;
   flex-shrink: 0;
 }
@@ -239,15 +261,16 @@ body {
   align-items: center;
   justify-content: center;
 }
-.act-teal { background: #2ED1C3; }
+.act-teal { background: #34D1BF; }
 .act-dark {
   background: transparent;
   border: 1.5px solid rgba(255,255,255,0.28);
 }
 .act-label {
-  font-size: 10.5px;
+  font-size: 10px;
+  letter-spacing: -0.1px;
   font-weight: 400;
-  color: #8E8E93;
+  color: rgba(235,235,245,0.6);
   text-align: center;
   line-height: 1.35;
 }
@@ -255,28 +278,29 @@ body {
 /* ── 分区标题 ── */
 .section-title {
   font-size: 20px;
-  font-weight: 640;
+  font-weight: 600;
   color: #fff;
   padding: 10px 20px 8px;
   letter-spacing: -0.2px;
   flex-shrink: 0;
 }
 
-/* ── 卡片 ── */
+/* ── 卡片（浮层感+阴影） ── */
 .card {
   margin: 0 14px 18px;
   background: #1c1c1e;
   border-radius: 13px;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03), 0 6px 16px rgba(0,0,0,0.4);
 }
 .row {
   display: flex;
   align-items: center;
-  padding: 13px 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 12px 14px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.06);
   gap: 12px;
-  min-height: 58px;
+  min-height: 56px;
 }
 .row:last-child { border-bottom: none; }
 
@@ -296,7 +320,7 @@ body {
 .row-text .rlabel {
   font-size: 11.5px;
   font-weight: 400;
-  color: #8E8E93;
+  color: rgba(235,235,245,0.6);
   margin-bottom: 2px;
 }
 .row-text .rval {
@@ -319,7 +343,7 @@ body {
   color: #fff;
 }
 
-/* Tags 区域 - 放在底部 */
+/* Tags 区域 */
 .tags-footer {
   flex: 1;
   display: flex;
@@ -328,7 +352,7 @@ body {
 }
 .tags-title {
   font-size: 20px;
-  font-weight: 640;
+  font-weight: 600;
   color: #fff;
   padding: 10px 20px 8px;
   letter-spacing: -0.2px;
@@ -339,6 +363,7 @@ body {
   min-height: 20px;
 }
 
+/* Home Bar 更真实 */
 .home-bar {
   height: 34px;
   display: flex;
@@ -348,12 +373,24 @@ body {
   background: #111;
   flex-shrink: 0;
   margin-top: auto;
+  position: relative;
+  z-index: 2;
 }
 .home-bar div {
   width: 134px;
-  height: 5px;
-  background: rgba(255,255,255,0.3);
+  height: 4.5px;
+  background: rgba(255,255,255,0.25);
   border-radius: 3px;
+}
+
+/* 图标柔化（现在太锐，加一点点模糊更像真实截图） */
+svg {
+  filter: blur(0.15px);
+}
+
+/* 实时调节信号+WiFi透明度 */
+.fa-signal, .fa-wifi {
+  transition: opacity 0.1s ease;
 }
 </style>
 </head>
@@ -362,7 +399,7 @@ body {
 <!-- ═══════════ 控制面板 ═══════════ -->
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">最终精调 · iOS字体</div>
+  <div class="sub">终极真实 · 玻璃质感 · 带WiFi</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
@@ -385,30 +422,41 @@ body {
   <div class="field"><label>🔋 电池电量 (%)</label>
     <input id="i_batt" type="number" min="0" max="100" value="59"></div>
 
+  <!-- 信号强度调节 -->
+  <div class="field"><label>📶 信号强度 (1-4格)</label>
+    <input id="i_signal" type="range" min="1" max="4" step="1" value="4">
+    <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+      <span style="font-size: 10px; color:#8e8e93;">弱</span>
+      <span style="font-size: 10px; color:#8e8e93;">强</span>
+    </div>
+  </div>
+
+  <!-- WiFi 信号质量调节 -->
+  <div class="field"><label>📡 WiFi 信号质量</label>
+    <input id="i_wifi" type="range" min="0.2" max="1" step="0.01" value="1">
+    <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+      <span style="font-size: 10px; color:#8e8e93;">弱</span>
+      <span style="font-size: 10px; color:#8e8e93;">强</span>
+    </div>
+  </div>
+
   <button class="cbtn cbtn-teal" onclick="refresh()">✨ 更新预览</button>
-  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 4K 截图</button>
+  <button class="cbtn cbtn-dark" onclick="doShot()">📸 导出 3倍缩放截图</button>
 </div>
 
-<!-- ═══════════ 截图主区域 — 所有细节已优化 ═══════════ -->
+<!-- ═══════════ 截图主区域 — 带WiFi，无百分比 ═══════════ -->
 <div id="capture">
 
-  <!-- 状态栏 -->
+  <!-- 状态栏（带光影渐变） -->
   <div class="sbar">
     <span class="sbar-time" id="d_time">14:16</span>
     <div class="sbar-right">
-      <div class="signal-bars">
-        <span></span><span></span><span></span><span></span>
-      </div>
-      <div class="wifi-icon">
-        <svg width="17" height="12" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 5C6 2 14 2 18 5" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
-          <path d="M4 7C7 5 13 5 16 7" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
-          <path d="M7 9C9 8 11 8 13 9" stroke="white" stroke-width="1.2" stroke-linecap="round"/>
-          <circle cx="10" cy="11" r="1.2" fill="white"/>
-        </svg>
-      </div>
+      <!-- 信号图标 -->
+      <i class="fa-solid fa-signal" id="signalIcon" style="color: white; font-size: 12px;"></i>
+      <!-- WiFi图标 -->
+      <i class="fa-solid fa-wifi" id="wifiIcon" style="color: white; font-size: 12px;"></i>
+      <!-- 电池（无百分比） -->
       <div class="batt-wrap">
-        <span class="batt-pct" id="d_bpct">59</span>
         <div class="batt-body">
           <div class="batt-fill" id="d_bfill" style="width:13px"></div>
         </div>
@@ -492,7 +540,7 @@ body {
       <div class="row">
         <div class="ico ico-teal">
           <svg width="22" height="16" viewBox="0 0 26 18" fill="none">
-            <rect x="1" y="1" width="24" height="16" rx="2.5" fill="#2ED1C3"/>
+            <rect x="1" y="1" width="24" height="16" rx="2.5" fill="#34D1BF"/>
             <rect x="1" y="6" width="24" height="3.5" fill="#1a5550"/>
             <rect x="3" y="11" width="7" height="2.5" rx="0.8" fill="#1a5550"/>
           </svg>
@@ -552,18 +600,38 @@ body {
       </div>
     </div>
 
-    <!-- Tags 区域 - 放在底部 -->
+    <!-- Tags -->
     <div class="tags-footer">
       <div class="tags-title">Tags</div>
       <div class="tags-spacer"></div>
     </div>
 
-  </div><!-- /content -->
+  </div>
 
   <div class="home-bar"><div></div></div>
-</div><!-- /capture -->
+</div>
 
 <script>
+// 更新信号强度（通过透明度模拟）
+function updateSignal() {
+  const signalVal = parseInt(document.getElementById('i_signal').value);
+  const signalIcon = document.getElementById('signalIcon');
+  let opacity = 0.3;
+  if (signalVal === 2) opacity = 0.55;
+  else if (signalVal === 3) opacity = 0.75;
+  else if (signalVal === 4) opacity = 1;
+  else opacity = 0.3;
+  signalIcon.style.opacity = opacity;
+}
+
+// 更新WiFi信号质量（透明度）
+function updateWifi() {
+  const wifiVal = parseFloat(document.getElementById('i_wifi').value);
+  const wifiIcon = document.getElementById('wifiIcon');
+  wifiIcon.style.opacity = wifiVal;
+}
+
+// 刷新所有UI
 function refresh() {
   const g = id => document.getElementById(id);
   const v = id => document.getElementById(id).value.trim();
@@ -581,13 +649,16 @@ function refresh() {
   let pct = parseInt(v('i_batt'));
   if (isNaN(pct)) pct = 59;
   pct = Math.max(0, Math.min(100, pct));
-  g('d_bpct').textContent = pct;
   const fw = Math.max(1, (pct / 100) * 19);
   const fill = g('d_bfill');
   fill.style.width = fw + 'px';
   fill.classList.toggle('red', pct <= 20);
+  
+  updateSignal();
+  updateWifi();
 }
 
+// 固定3倍缩放截图
 async function doShot() {
   const btn = document.querySelectorAll('.cbtn')[1];
   const orig = btn.textContent;
@@ -598,16 +669,21 @@ async function doShot() {
   try {
     const el = document.getElementById('capture');
     const c = await html2canvas(el, {
-      scale: 4,
+      scale: 3,
+      width: 393,
+      height: el.scrollHeight,
+      windowWidth: 393,
+      windowHeight: el.scrollHeight,
       backgroundColor: '#000',
       logging: false,
-      useCORS: false
+      useCORS: true
     });
     const a = document.createElement('a');
     a.download = 'n26_' + Date.now() + '.png';
     a.href = c.toDataURL('image/png', 1.0);
     a.click();
   } catch(e) {
+    console.error(e);
     alert('截图失败，请刷新后重试');
   } finally {
     btn.textContent = orig;
@@ -615,8 +691,14 @@ async function doShot() {
   }
 }
 
-document.querySelectorAll('input,select').forEach(el =>
-  el.addEventListener('input', refresh));
+// 监听输入
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', refresh);
+  el.addEventListener('change', refresh);
+});
+document.getElementById('i_signal').addEventListener('input', updateSignal);
+document.getElementById('i_wifi').addEventListener('input', updateWifi);
+
 refresh();
 </script>
 </body>
