@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — 最终真机版</title>
+<title>N26 截图工具 — 完整最终版</title>
 <!-- Font Awesome 6 (仅用于WiFi图标) -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -177,6 +177,26 @@ body::after {
   transition: width 0.1s;
 }
 .batt-fill.red { background: #ff3b30 !important; }
+
+/* 返回栏 - 已恢复 */
+.back-bar {
+  display: flex;
+  align-items: center;
+  padding: 4px 14px 6px 14px;
+  background: #000;
+  gap: 2px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.back-bar svg {
+  margin-right: 3px;
+}
+.back-bar span {
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(235,235,245,0.85);
+}
 
 .content {
   background: #111;
@@ -372,12 +392,12 @@ body::after {
 
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">最终真机版 · 支持千位分隔符</div>
+  <div class="sub">完整最终版 · 含返回栏</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
-  <div class="field"><label>💰 金额（支持千位分隔符，如 23.673,00 €）</label>
-    <input id="i_amount" value="23.673,00 €"></div>
+  <div class="field"><label>💰 金额（支持千位分隔符）</label>
+    <input id="i_amount" value="75,00 €"></div>
   <div class="field"><label>📅 交易日期</label>
     <input id="i_date" value="Mittwoch, 2. April 2025, 14:16"></div>
   <div class="field"><label>🏷️ 类别 (Kategorie)</label>
@@ -435,6 +455,14 @@ body::after {
     </div>
   </div>
 
+  <!-- 返回栏 - 已恢复 -->
+  <div class="back-bar">
+    <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+      <path d="M8.5 1.5L1.5 8L8.5 14.5" stroke="rgba(235,235,245,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="d_back">TikTok</span>
+  </div>
+
   <div class="content">
     <div class="chevron-row">
       <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
@@ -443,7 +471,7 @@ body::after {
     </div>
 
     <div class="txn-name" id="d_name">Esteban Cuerva De La Fuente</div>
-    <div class="txn-amount" id="d_amount">23.673,00 €</div>
+    <div class="txn-amount" id="d_amount">75,00 €</div>
     <div class="txn-date" id="d_date">Mittwoch, 2. April 2025, 14:16</div>
 
     <div class="actions">
@@ -610,8 +638,7 @@ function refresh() {
   const v = id => document.getElementById(id).value.trim();
 
   if (g('d_name')) g('d_name').textContent = v('i_name') || 'Esteban Cuerva De La Fuente';
-  // 金额：原样显示，不做任何处理，支持千位分隔符
-  if (g('d_amount')) g('d_amount').textContent = v('i_amount') || '23.673,00 €';
+  if (g('d_amount')) g('d_amount').textContent = v('i_amount') || '75,00 €';
   if (g('d_date')) g('d_date').textContent = v('i_date') || 'Mittwoch, 2. April 2025, 14:16';
   if (g('d_kat')) g('d_kat').textContent = v('i_kat') || 'Gutschriften';
   if (g('d_zu')) g('d_zu').textContent = v('i_zu') || 'Hauptkonto';
