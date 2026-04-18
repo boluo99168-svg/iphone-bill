@@ -319,7 +319,7 @@ body::after {
   box-shadow: 0 0 0 0.5px rgba(255,255,255,0.04), 0 6px 16px rgba(0,0,0,0.4);
 }
 
-/* 🔥 行结构优化（N26真实间距） 🔥 */
+/* 行结构优化（N26真实间距） */
 .row {
   display: flex;
   align-items: center;
@@ -702,25 +702,51 @@ function refresh() {
   updateWifi();
 }
 
+// 🔥 修复截图函数 - 等待字体加载完成 🔥
+async function waitForFonts() {
+  if (document.fonts && document.fonts.ready) {
+    await document.fonts.ready;
+  }
+  // 额外等待一帧，确保渲染完成
+  await new Promise(resolve => requestAnimationFrame(resolve));
+  await new Promise(resolve => setTimeout(resolve, 50));
+}
+
 async function doShot() {
   const btn = document.querySelector('.cbtn-dark');
   if (!btn) return;
   const orig = btn.textContent;
-  btn.textContent = '⏳ 生成中...';
+  btn.textContent = '⏳ 渲染中...';
   btn.disabled = true;
+  
+  // 先刷新数据
   refresh();
-  await new Promise(r => setTimeout(r, 100));
+  
+  // 🔥 等待字体加载完成（关键！）
+  await waitForFonts();
+  
   try {
     const el = document.getElementById('capture');
     if (!el) throw new Error('截图区域不存在');
     if (typeof html2canvas === 'undefined') throw new Error('html2canvas库加载失败');
+    
+    // 🔥 使用更稳定的配置
     const canvas = await html2canvas(el, {
       scale: 3,
       backgroundColor: '#000000',
       logging: false,
       useCORS: false,
-      allowTaint: false
+      allowTaint: false,
+      // 🔥 强制使用相同的渲染方式
+      onclone: (clonedDoc, element) => {
+        // 确保克隆的文档样式一致
+        const clonedAmount = clonedDoc.querySelector('.txn-amount');
+        if (clonedAmount) {
+          clonedAmount.style.fontFamily = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif';
+        }
+      }
     });
+    
     const link = document.createElement('a');
     link.download = `n26_${Date.now()}.png`;
     link.href = canvas.toDataURL('image/png');
