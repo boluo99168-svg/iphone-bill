@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>N26 截图工具 — 最终真机版</title>
-<!-- Font Awesome 6 (仅用于WiFi图标) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<title>N26 截图工具 — 真机级状态栏版</title>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
 * {
@@ -16,11 +14,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-feature-settings: "kern" 1;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
   background: #000;
   color: rgba(235,235,245,0.85);
   display: flex;
@@ -103,80 +100,95 @@ body::after {
   z-index: 5;
 }
 
+/* ===== 🍎 iPhone 16 状态栏 — 1:1 复刻 ===== */
 .sbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 18px 6px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.85));
-  backdrop-filter: blur(6px);
+  height: 54px;
+  padding: 0 21px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.97), rgba(0,0,0,0.88));
   flex-shrink: 0;
   position: relative;
   z-index: 2;
 }
+
+/* 🏝 Dynamic Island — iPhone 16 精确尺寸 */
+.dynamic-island {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 10px;
+  width: 126px;
+  height: 37px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 4;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 8px rgba(0,0,0,0.8);
+}
+
+/* 🕐 时间 */
 .sbar-time {
   font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
+  font-weight: 590;
+  letter-spacing: -0.3px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
-  color: rgba(235,235,245,0.9);
+  color: rgba(255,255,255,0.94);
+  position: relative;
+  z-index: 5;
+  line-height: 1;
 }
+
+/* 右侧图标组 */
 .sbar-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  position: relative;
+  z-index: 5;
 }
 
-#signalIcon {
-  transform: scale(0.9);
+/* ===== 📶 信号图标 — iOS 18 精确版 ===== */
+.signal-svg {
+  width: 17px;
+  height: 13px;
+  display: block;
+  overflow: visible;
+}
+
+/* ===== 📡 WiFi图标 — iOS 18 精确版（使用您提供的精确坐标）===== */
+.wifi-svg {
+  width: 16px;
+  height: 13px;
   display: block;
 }
-#signalIcon rect {
-  shape-rendering: geometricPrecision;
+
+/* ===== 🔋 电池图标 — iOS 16+ 百分比内置版 ===== */
+.battery-svg {
+  display: block;
+  overflow: visible;
 }
 
-.fa-wifi {
-  font-size: 12px;
-  color: rgba(235,235,245,0.9);
-  display: inline-block;
-  filter: none;
-  opacity: 0.9;
-}
-
-.batt-wrap {
+/* 返回栏 */
+.back-bar {
   display: flex;
   align-items: center;
-}
-.batt-body {
-  width: 24px;
-  height: 11px;
-  border: 1.2px solid rgba(235,235,245,0.6);
-  border-radius: 2px;
+  padding: 4px 14px 6px 14px;
+  background: #000;
+  gap: 2px;
+  flex-shrink: 0;
   position: relative;
-  background: transparent;
+  z-index: 2;
 }
-.batt-body::after {
-  content: '';
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2.5px;
-  height: 4px;
-  background: rgba(235,235,245,0.5);
-  border-radius: 0 1px 1px 0;
+.back-bar svg {
+  margin-right: 3px;
 }
-.batt-fill {
-  position: absolute;
-  left: 1.5px;
-  top: 1.5px;
-  height: calc(100% - 3px);
-  border-radius: 1px;
-  background: rgba(255,255,255,0.85);
-  transition: width 0.1s;
+.back-bar span {
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(235,235,245,0.85);
 }
-.batt-fill.red { background: #ff3b30 !important; }
 
 .content {
   background: #111;
@@ -202,8 +214,9 @@ body::after {
   letter-spacing: -0.2px;
   color: rgba(235,235,245,0.85);
   padding: 0 20px;
-  margin-top: 2px;
-  line-height: 1.2;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  line-height: 1.25;
   flex-shrink: 0;
 }
 .txn-amount {
@@ -213,7 +226,8 @@ body::after {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
   color: #2BD8C8;
-  padding: 0 20px 0 20px;
+  padding: 0 20px;
+  margin-bottom: 6px;
   line-height: 1.1;
   flex-shrink: 0;
 }
@@ -221,8 +235,8 @@ body::after {
   font-size: 13px;
   font-weight: 400;
   color: rgba(235,235,245,0.6);
-  padding: 0 20px 0 20px;
-  margin-top: -1px;
+  padding: 0 20px;
+  margin-bottom: 20px;
   flex-shrink: 0;
 }
 
@@ -280,15 +294,34 @@ body::after {
   backdrop-filter: blur(4px);
   box-shadow: 0 0 0 0.5px rgba(255,255,255,0.04), 0 6px 16px rgba(0,0,0,0.4);
 }
+
 .row {
   display: flex;
   align-items: center;
-  padding: 12px 14px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.035);
-  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.025);
+  gap: 10px;
   min-height: 56px;
 }
 .row:last-child { border-bottom: none; }
+
+.row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-arrow {
+  margin-left: auto;
+  color: rgba(235,235,245,0.35);
+  font-size: 17px;
+  font-weight: 300;
+  transform: translateY(-0.5px);
+}
+
+.row-copy {
+  margin-left: 6px;
+  color: rgba(235,235,245,0.35);
+}
 
 .ico {
   width: 34px;
@@ -302,7 +335,6 @@ body::after {
 .ico-gray  { background: #2c2c2e; }
 .ico-teal  { background: #183c3c; }
 
-.row-text { flex:1; min-width:0; }
 .row-text .rlabel {
   font-size: 11.5px;
   font-weight: 400;
@@ -314,13 +346,6 @@ body::after {
   font-weight: 450;
   color: rgba(235,235,245,0.78);
 }
-.row-arrow {
-  color: rgba(235,235,245,0.4);
-  font-size: 18px;
-  font-weight: 300;
-  margin-left: 4px;
-}
-.row-copy { color: rgba(235,235,245,0.35); margin-left: 4px; }
 
 .notiz-text {
   flex:1;
@@ -372,12 +397,12 @@ body::after {
 
 <div class="ctrl">
   <h3>N26 截图工具</h3>
-  <div class="sub">最终真机版 · 支持千位分隔符</div>
+  <div class="sub">iPhone 16 · Dynamic Island · iOS 18 状态栏</div>
 
   <div class="field"><label>👤 收款人姓名</label>
     <input id="i_name" value="Esteban Cuerva De La Fuente"></div>
-  <div class="field"><label>💰 金额（支持千位分隔符，如 23.673,00 €）</label>
-    <input id="i_amount" value="23.673,00 €"></div>
+  <div class="field"><label>💰 金额</label>
+    <input id="i_amount" value="75,00 €"></div>
   <div class="field"><label>📅 交易日期</label>
     <input id="i_date" value="Mittwoch, 2. April 2025, 14:16"></div>
   <div class="field"><label>🏷️ 类别 (Kategorie)</label>
@@ -417,22 +442,84 @@ body::after {
 
 <div id="capture">
 
+  <!-- ===== 🍎 iPhone 16 状态栏 — 1:1 精确复刻 ===== -->
   <div class="sbar">
     <span class="sbar-time" id="d_time">14:16</span>
+    <div class="dynamic-island"></div>
     <div class="sbar-right">
-      <svg id="signalIcon" width="20" height="12" viewBox="0 0 20 12">
-        <rect x="0" y="7" width="3" height="5" rx="1" fill="rgba(255,255,255,0.92)"/>
-        <rect x="5" y="5" width="3" height="7" rx="1" fill="rgba(255,255,255,0.92)"/>
-        <rect x="10" y="3" width="3" height="9" rx="1" fill="rgba(255,255,255,0.92)"/>
-        <rect x="15" y="1" width="3" height="11" rx="1" fill="rgba(255,255,255,0.92)"/>
+
+      <!-- 📶 信号图标 -->
+      <svg class="signal-svg" id="signalSvg" viewBox="0 0 17 13" fill="none">
+        <rect id="sig1" x="0"    y="9"   width="3" height="4"    rx="1" fill="white"/>
+        <rect id="sig2" x="4.5"  y="6.5" width="3" height="6.5"  rx="1" fill="white"/>
+        <rect id="sig3" x="9"    y="3.5" width="3" height="9.5"  rx="1" fill="white"/>
+        <rect id="sig4" x="13.5" y="0.5" width="3" height="12.5" rx="1" fill="white"/>
       </svg>
-      <i class="fa-solid fa-wifi" id="wifiIcon" style="color: rgba(235,235,245,0.9); font-size: 12px;"></i>
-      <div class="batt-wrap">
-        <div class="batt-body">
-          <div class="batt-fill" id="d_bfill" style="width:13px"></div>
-        </div>
-      </div>
+
+      <!-- 📡 WiFi图标 — 使用您提供的精确坐标 -->
+      <svg class="wifi-svg" id="wifiSvg" viewBox="0 0 16 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- 外弧 -->
+        <path id="wArc1"
+          d="M0.8 4.8 C4.2 0.6 11.8 0.6 15.2 4.8"
+          stroke="white"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          fill="none"/>
+        <!-- 中弧 -->
+        <path id="wArc2"
+          d="M3.2 7.6 C5.8 4.8 10.2 4.8 12.8 7.6"
+          stroke="white"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          fill="none"/>
+        <!-- 内弧 -->
+        <path id="wArc3"
+          d="M5.9 10.2 C7.0 8.9 9.0 8.9 10.1 10.2"
+          stroke="white"
+          stroke-width="2.1"
+          stroke-linecap="round"
+          fill="none"/>
+        <!-- 圆点 -->
+        <circle id="wDot" cx="8" cy="12.2" r="1.4" fill="white"/>
+      </svg>
+
+      <!-- 🔋 电池图标 -->
+      <svg class="battery-svg" id="batterySvg"
+           width="28" height="13" viewBox="0 0 28 13"
+           xmlns="http://www.w3.org/2000/svg">
+        <rect id="battOutline"
+              x="0.65" y="0.65" width="22.7" height="11.7" rx="3.4"
+              stroke="rgba(255,255,255,0.72)" stroke-width="1.3"
+              fill="none"/>
+        <rect id="battNub"
+              x="24.1" y="4.3" width="2.6" height="4.4" rx="1.3"
+              fill="rgba(255,255,255,0.72)"/>
+        <clipPath id="battClip">
+          <rect x="2.2" y="2.2" width="19.1" height="8.6" rx="2"/>
+        </clipPath>
+        <rect id="battFill"
+              x="2.2" y="2.2" width="11.27" height="8.6" rx="2"
+              fill="white"
+              clip-path="url(#battClip)"/>
+        <text id="battPercent"
+              x="12.2" y="9.7"
+              text-anchor="middle"
+              font-size="7"
+              font-weight="700"
+              font-family="-apple-system, 'SF Pro Display', BlinkMacSystemFont, sans-serif"
+              letter-spacing="-0.3"
+              fill="black">59%</text>
+      </svg>
+
     </div>
+  </div>
+
+  <!-- 返回栏 -->
+  <div class="back-bar">
+    <svg width="10" height="16" viewBox="0 0 10 16" fill="none">
+      <path d="M8.5 1.5L1.5 8L8.5 14.5" stroke="rgba(235,235,245,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="d_back">TikTok</span>
   </div>
 
   <div class="content">
@@ -443,7 +530,7 @@ body::after {
     </div>
 
     <div class="txn-name" id="d_name">Esteban Cuerva De La Fuente</div>
-    <div class="txn-amount" id="d_amount">23.673,00 €</div>
+    <div class="txn-amount" id="d_amount">75,00 €</div>
     <div class="txn-date" id="d_date">Mittwoch, 2. April 2025, 14:16</div>
 
     <div class="actions">
@@ -589,51 +676,81 @@ body::after {
 </div>
 
 <script>
+// ===== 📶 更新信号图标 =====
 function updateSignal() {
   const level = parseInt(document.getElementById('i_signal').value);
-  const bars = document.querySelectorAll('#signalIcon rect');
-  const activeColor = 'rgba(255,255,255,0.92)';
-  const inactiveColor = 'rgba(255,255,255,0.22)';
+  const bars = [
+    document.getElementById('sig1'),
+    document.getElementById('sig2'),
+    document.getElementById('sig3'),
+    document.getElementById('sig4')
+  ];
   bars.forEach((bar, index) => {
-    bar.setAttribute('fill', index < level ? activeColor : inactiveColor);
+    bar.setAttribute('fill', index < level ? 'white' : 'rgba(255,255,255,0.25)');
   });
 }
 
+// ===== 📡 更新 WiFi 图标（使用精确坐标）=====
 function updateWifi() {
   const wifiVal = parseFloat(document.getElementById('i_wifi').value);
-  const wifiIcon = document.getElementById('wifiIcon');
-  if (wifiIcon) wifiIcon.style.opacity = wifiVal;
+  const arcs = [
+    document.getElementById('wArc1'),
+    document.getElementById('wArc2'),
+    document.getElementById('wArc3')
+  ];
+  const dot = document.getElementById('wDot');
+  const opacities = [0.30, 0.65, 0.92].map(o => (o * wifiVal).toFixed(2));
+  arcs.forEach((arc, i) => {
+    arc.setAttribute('stroke', `rgba(255,255,255,${opacities[i]})`);
+  });
+  dot.setAttribute('fill', `rgba(255,255,255,${wifiVal.toFixed(2)})`);
 }
 
+// ===== 🔋 更新电池图标 =====
+function updateBattery(pct) {
+  const battFill    = document.getElementById('battFill');
+  const battPercent = document.getElementById('battPercent');
+  const battOutline = document.getElementById('battOutline');
+  const battNub     = document.getElementById('battNub');
+  const maxFillW = 19.1;
+  const fillW = (pct / 100 * maxFillW).toFixed(2);
+  battFill.setAttribute('width', fillW);
+  battPercent.textContent = pct + '%';
+  if (pct <= 20) {
+    battFill.setAttribute('fill', '#ff3b30');
+    battOutline.setAttribute('stroke', '#ff3b30');
+    battNub.setAttribute('fill', '#ff3b30');
+    battPercent.setAttribute('fill', 'white');
+  } else {
+    battFill.setAttribute('fill', 'white');
+    battOutline.setAttribute('stroke', 'rgba(255,255,255,0.72)');
+    battNub.setAttribute('fill', 'rgba(255,255,255,0.72)');
+    battPercent.setAttribute('fill', 'black');
+  }
+}
+
+// ===== 全局刷新 =====
 function refresh() {
-  const g = id => document.getElementById(id);
   const v = id => document.getElementById(id).value.trim();
-
-  if (g('d_name')) g('d_name').textContent = v('i_name') || 'Esteban Cuerva De La Fuente';
-  // 金额：原样显示，不做任何处理，支持千位分隔符
-  if (g('d_amount')) g('d_amount').textContent = v('i_amount') || '23.673,00 €';
-  if (g('d_date')) g('d_date').textContent = v('i_date') || 'Mittwoch, 2. April 2025, 14:16';
-  if (g('d_kat')) g('d_kat').textContent = v('i_kat') || 'Gutschriften';
-  if (g('d_zu')) g('d_zu').textContent = v('i_zu') || 'Hauptkonto';
-  if (g('d_type')) g('d_type').textContent = v('i_type') || 'Echtzeitüberweisung';
-  if (g('d_zweck')) g('d_zweck').textContent = v('i_zweck') || '1';
-  if (g('d_back')) g('d_back').textContent = v('i_back') || 'TikTok';
-  if (g('d_time')) g('d_time').textContent = v('i_time') || '14:16';
-
+  const g = id => document.getElementById(id);
+  if (g('d_name'))   g('d_name').textContent   = v('i_name')   || 'Esteban Cuerva De La Fuente';
+  if (g('d_amount')) g('d_amount').textContent  = v('i_amount') || '75,00 €';
+  if (g('d_date'))   g('d_date').textContent    = v('i_date')   || 'Mittwoch, 2. April 2025, 14:16';
+  if (g('d_kat'))    g('d_kat').textContent     = v('i_kat')    || 'Gutschriften';
+  if (g('d_zu'))     g('d_zu').textContent      = v('i_zu')     || 'Hauptkonto';
+  if (g('d_type'))   g('d_type').textContent    = v('i_type')   || 'Echtzeitüberweisung';
+  if (g('d_zweck'))  g('d_zweck').textContent   = v('i_zweck')  || '1';
+  if (g('d_back'))   g('d_back').textContent    = v('i_back')   || 'TikTok';
+  if (g('d_time'))   g('d_time').textContent    = v('i_time')   || '14:16';
   let pct = parseInt(v('i_batt'));
   if (isNaN(pct)) pct = 59;
   pct = Math.max(0, Math.min(100, pct));
-  const fw = Math.max(2, (pct / 100) * 20);
-  const fill = g('d_bfill');
-  if (fill) {
-    fill.style.width = fw + 'px';
-    fill.classList.toggle('red', pct <= 20);
-  }
-  
+  updateBattery(pct);
   updateSignal();
   updateWifi();
 }
 
+// ===== 截图导出 =====
 async function doShot() {
   const btn = document.querySelector('.cbtn-dark');
   if (!btn) return;
@@ -646,11 +763,13 @@ async function doShot() {
     const el = document.getElementById('capture');
     if (!el) throw new Error('截图区域不存在');
     if (typeof html2canvas === 'undefined') throw new Error('html2canvas库加载失败');
+    const scale = window.devicePixelRatio * 2 || 3;
     const canvas = await html2canvas(el, {
-      scale: 3,
+      scale: scale,
+      useCORS: true,
       backgroundColor: '#000000',
+      foreignObjectRendering: true,
       logging: false,
-      useCORS: false,
       allowTaint: false
     });
     const link = document.createElement('a');
@@ -670,12 +789,6 @@ document.querySelectorAll('input, select').forEach(el => {
   el.addEventListener('input', refresh);
   el.addEventListener('change', refresh);
 });
-
-const signalInput = document.getElementById('i_signal');
-const wifiInput = document.getElementById('i_wifi');
-if (signalInput) signalInput.addEventListener('input', updateSignal);
-if (wifiInput) wifiInput.addEventListener('input', updateWifi);
-
 refresh();
 </script>
 </body>
